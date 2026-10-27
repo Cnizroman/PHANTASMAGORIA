@@ -1,0 +1,14 @@
+{
+  "name": "phantasmagoria-fan-site",
+  "private": true,
+  "description": "Static MZLFF / PHANTASMAGORIA fan site",
+  "scripts": {
+    "lyrics": "node scripts/build-lyrics.js",
+    "test": "node --test tests/unit/*.test.js",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.64.1"
+  }
+}

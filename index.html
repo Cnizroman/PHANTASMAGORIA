@@ -8,13 +8,20 @@
 <meta property="og:type" content="website"><meta property="og:title" content="MZLFF / PHANTASMAGORIA"><meta property="og:description" content="Интерактивный фан-сайт альбома PHANTASMAGORIA: плеер, синхронный текст, история и тур."><meta property="og:image" content="assets/og.jpg"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="assets/favicon.png"><link rel="apple-touch-icon" href="assets/favicon.png">
 <title>MZLFF / PHANTASMAGORIA</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="fonts.css">
 <link rel="preload" as="image" href="assets/cover.jpg">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<svg class="icon-sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="icon-play" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.5v13L19 12z"/></symbol>
+  <symbol id="icon-pause" viewBox="0 0 24 24"><path fill="currentColor" d="M7 5h4v14H7zm6 0h4v14h-4z"/></symbol>
+  <symbol id="icon-prev" viewBox="0 0 24 24"><path fill="currentColor" d="M6 5h2v14H6zm12 1v12L9 12z"/></symbol>
+  <symbol id="icon-next" viewBox="0 0 24 24"><path fill="currentColor" d="M16 5h2v14h-2zM6 6v12l9-6z"/></symbol>
+  <symbol id="icon-shuffle" viewBox="0 0 24 24"><path d="M4 7h3c5 0 5 10 10 10h3m-3-3 3 3-3 3M4 17h3c1.8 0 2.9-1.2 4-3m2-4c1.1-1.8 2.2-3 4-3h3m-3-3 3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-repeat" viewBox="0 0 24 24"><path d="M18 8H7a4 4 0 0 0-4 4m3-7L3 8l3 3m0 5h11a4 4 0 0 0 4-4m-3 7 3-3-3-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-volume" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4zm12-1a5 5 0 0 1 0 8m2-11a9 9 0 0 1 0 14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
 <a class="skip" href="#top">К содержимому</a>
 <div class="site-noise"></div>
 <div class="glow glow-a"></div><div class="glow glow-b"></div>
@@ -30,7 +37,7 @@
     <a href="#tracks">треклист</a>
     <a href="#artist">mzlff</a>
     <a href="#tour">тур</a>
-    <a href="#sources">контакты</a>
+    <a href="#sources">источники</a>
   </nav>
   <button class="nav-toggle" aria-label="Открыть меню" aria-expanded="false" aria-controls="nav">☰</button>
 </header>
@@ -61,7 +68,7 @@
       </div>
       <div class="hero-bottom">
         <div class="scribble">Не задерживайся<br>после закрытия.</div>
-        <div class="hero-poster"><img src="assets/poster.jpg" alt="PHANTASMAGORIA TOUR" loading="lazy" width="1200" height="1199"></div>
+        <div class="hero-ticket"><span>ВХОДНОЙ БИЛЕТ</span><b>08 / 08</b><small>ОДНА ИСТОРИЯ · ВОСЕМЬ ТРЕКОВ</small></div>
       </div>
     </div>
 
@@ -85,8 +92,9 @@
 
   <section class="chars section-frame reveal" id="chars">
     <div class="section-number">02.5 / ПЕРСОНАЖИ</div>
-    <div class="section-title"><h2>Кто<br><em>в парке.</em></h2><p>Герои обложки и сюжета. Описания собраны по текстам песен и отзывам слушателей, это прочтение, а не официальный канон.</p></div>
+    <div class="section-title"><h2>Кто<br><em>в парке.</em></h2><p>Знакомые лица за фасадом парка. Кадры — из официальных анимационных видео; описания по текстам песен и отзывам слушателей, это прочтение, а не официальный канон.</p></div>
     <div class="char-grid" id="charGrid"></div>
+    <p class="art-credit">ВИЗУАЛЫ АЛЬБОМА: ЛЕГАВАЯ × SANYAUNIQ · КАДРЫ ИЗ ВИДЕО MZLFF</p>
     <p class="note">Слово «фантасмагория» пришло из XVIII века: так называли театральные шоу, где с помощью оптики и проекций показывали призраков и движущиеся образы. Точнее для этого парка название не придумать.</p>
   </section>
 
@@ -98,30 +106,47 @@
 
   <section class="listen section-frame reveal" id="listen">
     <div class="section-number">04 / СЛУШАТЬ</div>
+    <div class="listen-intro">
+      <div><span class="listen-kicker">THE SOUND OF THE PARK</span><h2>Слушай <em>историю.</em></h2></div>
+      <p>Восемь глав, один маршрут. Выбери трек и нажми на строку текста, чтобы перейти к нужному моменту.</p>
+    </div>
     <div class="player-layout">
       <div class="player-column">
         <div class="player-card">
+          <div class="player-topline"><span>ПЛЕЕР / MZLFF</span><span id="trackCounter">01 / 08</span></div>
           <div class="player-heading">
-            <div><span class="tiny-label">NOW PLAYING / <b id="trackCounter">01 / 08</b></span><h2 id="nowTitle">мало-помалу</h2><p id="nowDesc">Вход в парк: праздничный фасад и первые признаки того, что за весельем скрывается нечто совсем другое.</p></div>
-            <div class="mini-cover"><img id="nowCover" src="assets/cover.jpg" alt="Текущий трек"></div>
+            <div class="mini-cover"><img id="nowCover" src="assets/cover.jpg" alt="Обложка текущего трека" width="128" height="128"></div>
+            <div class="player-heading-copy"><span class="tiny-label">СЕЙЧАС ИГРАЕТ</span><h3 id="nowTitle">мало-помалу</h3><p id="nowDesc">Вход в парк: праздничный фасад и первые признаки того, что за весельем скрывается нечто совсем другое.</p></div>
           </div>
-          <canvas id="viz" aria-hidden="true"></canvas>
-          <div class="progress"><input id="seek" type="range" min="0" max="1000" value="0" aria-label="Перемотка"><div><span id="currentTime">00:00</span><span id="duration">00:00</span></div></div>
-          <div class="controls">
-            <button id="shuffle" aria-label="Случайный порядок" title="Случайный порядок">⤨</button>
-            <button id="prev" aria-label="Предыдущий трек" title="Предыдущий">◀◀</button>
-            <button id="play" aria-label="Воспроизвести" class="play" title="Воспроизвести">▶</button>
-            <button id="next" aria-label="Следующий трек" title="Следующий">▶▶</button>
-            <button id="repeat" aria-label="Повтор" title="Повтор">↻</button>
-            <label class="vol">VOL <input id="volume" aria-label="Громкость" type="range" min="0" max="1" step="0.01" value="0.8"></label>
+          <div class="source-switch"><span>ИСТОЧНИК</span><div role="group" aria-label="Источник воспроизведения"><button type="button" id="sourceAudio" aria-pressed="true">АУДИО</button><button type="button" id="sourceVideo" aria-pressed="false">ВИДЕО</button></div></div>
+          <div class="video-panel" id="videoPanel" hidden>
+            <div class="video-frame"><div id="youtubeMount"></div></div>
+            <p>Официальное видео MZLFF на YouTube. Если запуск не начался, нажми ▶ в видео.</p>
           </div>
-          <div class="story-box" id="storyBox"></div>
+          <div class="visualizer" id="viz" aria-hidden="true"></div>
+          <div class="progress"><input id="seek" type="range" min="0" max="1000" value="0" aria-label="Перемотка трека" aria-valuetext="00:00 из 02:39"><div><span id="currentTime">00:00</span><span id="duration">02:39</span></div></div>
+          <div class="controls" aria-label="Управление воспроизведением">
+            <button id="shuffle" type="button" aria-label="Случайный порядок" aria-pressed="false" title="Случайный порядок"><svg aria-hidden="true"><use href="#icon-shuffle"></use></svg></button>
+            <button id="prev" type="button" aria-label="Предыдущий трек" title="Предыдущий трек"><svg aria-hidden="true"><use href="#icon-prev"></use></svg></button>
+            <button id="play" type="button" aria-label="Воспроизвести" class="play" title="Воспроизвести"><svg aria-hidden="true"><use href="#icon-play"></use></svg></button>
+            <button id="next" type="button" aria-label="Следующий трек" title="Следующий трек"><svg aria-hidden="true"><use href="#icon-next"></use></svg></button>
+            <button id="repeat" type="button" aria-label="Повторять альбом" aria-pressed="false" title="Повторять альбом"><svg aria-hidden="true"><use href="#icon-repeat"></use></svg></button>
+          </div>
+          <div class="player-bottom">
+            <label class="vol"><svg aria-hidden="true"><use href="#icon-volume"></use></svg><span class="sr-only">Громкость</span><input id="volume" aria-label="Громкость" type="range" min="0" max="100" step="1" value="80"></label>
+            <div class="player-status" id="playerStatus" role="status"><span class="status-dot"></span><span id="statusText">Готово к прослушиванию</span></div>
+          </div>
+          <div class="player-error" id="playerError" hidden><p id="errorText"></p><div><button type="button" id="retry">Попробовать снова</button><button type="button" id="errorVideo">Включить видео</button><a id="errorLink" href="https://www.youtube.com/watch?v=HIl0jzLga58" target="_blank" rel="noopener noreferrer">Открыть YouTube ↗</a></div></div>
+          <div class="player-links"><a id="videoLink" href="https://www.youtube.com/watch?v=HIl0jzLga58" target="_blank" rel="noopener noreferrer">ОФИЦИАЛЬНОЕ ВИДЕО ↗</a><button type="button" id="shareTrack">СКОПИРОВАТЬ ССЫЛКУ ↗</button></div>
+          <details class="story-details"><summary><span>СЮЖЕТ ЭТОЙ ГЛАВЫ</span><span aria-hidden="true">+</span></summary><div class="story-box" id="storyBox"></div></details>
           <audio id="audio" preload="none"></audio>
         </div>
       </div>
       <div class="lyrics-card" id="lyricsShell">
-        <div class="lyrics-header"><span>LYRICS / SYNC</span><div class="nudge" role="group" aria-label="Подстройка текста"><button id="offMinus" aria-label="Текст раньше на полсекунды">−0.5</button><span id="offVal" title="Сдвиг текста для этого трека">SYNC 0.0s</span><button id="offPlus" aria-label="Текст позже на полсекунды">+0.5</button><button id="lyricsHelp" aria-label="О синхронизации">?</button></div></div>
-        <div id="lyrics" class="lyrics"><p class="lyrics-empty" role="status">Загрузка текста…</p></div>
+        <div class="lyrics-header"><div><span>ТЕКСТ / СИНХРОНИЗАЦИЯ</span><p>Нажми на строку, чтобы перемотать</p></div><span class="lyrics-live"><i></i> LIVE</span></div>
+        <div class="lyrics-tools"><span>СДВИГ ТЕКСТА</span><div class="nudge" role="group" aria-label="Подстройка текста"><button id="offMinus" type="button" aria-label="−0.5: показывать текст на полсекунды раньше" title="Показывать раньше">−0.5</button><button id="offReset" type="button" aria-label="0.0 с: сбросить сдвиг текста" title="Сбросить сдвиг">0.0 с</button><button id="offPlus" type="button" aria-label="+0.5: показывать текст на полсекунды позже" title="Показывать позже">+0.5</button><button id="lyricsHelp" type="button" aria-label="О синхронизации">?</button></div></div>
+        <div id="lyrics" class="lyrics" tabindex="0" aria-label="Текст текущего трека"><p class="lyrics-empty" role="status">Загрузка текста…</p></div>
+        <div class="lyrics-footer"><span>ТАЙМКОДЫ ДЛЯ АЛЬБОМНОЙ ВЕРСИИ</span><button type="button" id="followLyrics" hidden>↓ К ТЕКУЩЕЙ СТРОКЕ</button></div>
       </div>
     </div>
   </section>
@@ -148,18 +173,28 @@
       <a href="https://the-flow.ru/releases/mzlff-phantasmagoria" target="_blank" rel="noreferrer"><span>01</span><b>THE FLOW</b><small>концепция, сюжет, релиз</small><i>↗</i></a>
       <a href="https://open.spotify.com/album/3tZNBj3xEJcpzgmI3xdENj" target="_blank" rel="noreferrer"><span>02</span><b>SPOTIFY</b><small>треклист и длительности</small><i>↗</i></a>
       <a href="https://music.apple.com/ru/album/phantasmagoria/1839170497" target="_blank" rel="noreferrer"><span>03</span><b>APPLE MUSIC</b><small>релиз 26.09.2025, The Fence</small><i>↗</i></a>
-      <a href="https://www.youtube.com/watch?v=rKTpLEmMq4w" target="_blank" rel="noreferrer"><span>04</span><b>YOUTUBE</b><small>альбом целиком с таймкодами</small><i>↗</i></a>
+      <a href="https://www.youtube.com/watch?v=JFHYBcEt4mg" target="_blank" rel="noopener noreferrer"><span>04</span><b>YOUTUBE / MZLFF</b><small>официальные анимационные видео</small><i>↗</i></a>
       <a href="https://risazatvorchestvo.com/album/phantasmagoria" target="_blank" rel="noreferrer"><span>05</span><b>РИСА ЗА ТВОРЧЕСТВО</b><small>отзывы слушателей и теории сюжета</small><i>↗</i></a>
       <a href="https://t.me/s/mazellovvv?before=13255" target="_blank" rel="noreferrer"><span>06</span><b>MZLFF</b><small>официальные публикации</small><i>↗</i></a>
       <a href="https://t.me/s/tour_mzlff?before=570" target="_blank" rel="noreferrer"><span>07</span><b>MZLFF.TOURS</b><small>официальный архив тура</small><i>↗</i></a>
+      <a href="https://lrclib.net/" target="_blank" rel="noopener noreferrer"><span>08</span><b>LRCLIB</b><small>таймкоды текстов альбома</small><i>↗</i></a>
     </div>
   </section>
 </main>
 
 <footer><div><strong>MZLFF / PHANTASMAGORIA</strong><span>ремейк Cnizroman · 2026</span></div><div>NO EXIT / NO REFUND</div></footer>
-<div class="toast" id="toast"></div>
+<div class="mini-player" id="miniPlayer" hidden aria-label="Мини-плеер">
+  <div class="mini-progress" aria-hidden="true"><span id="miniProgress"></span></div>
+  <a class="mini-info" href="#listen"><img id="miniCover" src="assets/cover.jpg" alt="" width="42" height="42"><span><small>СЕЙЧАС ИГРАЕТ</small><b id="miniTitle">мало-помалу</b></span></a>
+  <span id="miniTime" class="mini-time">00:00</span>
+  <button type="button" id="miniPlay" aria-label="Воспроизвести"><svg aria-hidden="true"><use href="#icon-play"></use></svg></button>
+  <button type="button" id="miniNext" aria-label="Следующий трек"><svg aria-hidden="true"><use href="#icon-next"></use></svg></button>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<noscript><p class="no-script">Для плеера и текста нужен JavaScript. Альбом можно послушать <a href="https://www.youtube.com/watch?v=HIl0jzLga58">на YouTube</a>.</p></noscript>
 <script src="lyrics.js" defer></script>
 <script src="story.js" defer></script>
+<script src="player-core.js" defer></script>
 <script src="script.js" defer></script>
 </body>
 </html>
