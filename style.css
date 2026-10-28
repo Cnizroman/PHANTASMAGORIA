@@ -645,7 +645,7 @@ main { padding-top: var(--bar); }
 
 /* Only the plain numeral watermark is dropped on narrow screens. */
 @media (max-width: 720px) {
-  .section-frame::before { font-size: clamp(96px, 26vw, 180px); opacity: .7; }
+  .section-frame:not(:has(.chapter--center))::before { font-size: clamp(96px, 26vw, 180px); opacity: .62; }
 }
 
 /* Album route: an always-visible table of contents inside the hero */
@@ -717,17 +717,18 @@ main { padding-top: var(--bar); }
   overflow: clip;
   max-width: 1480px;
   margin: 0 auto;
-  padding: var(--section-pad) var(--pad-x);
+  padding: var(--section-pad) var(--pad-x) calc(var(--section-pad) * .58);
   border-top: 1px solid var(--line-2);
 }
+.section-frame:has(.chapter--center)::before { display: none; }
 .section-frame::before {
   content: attr(data-num);
   position: absolute; z-index: -1;
-  right: calc(var(--pad-x) - .04em); top: clamp(10px, 1.4vw, 26px);
+  right: calc(var(--pad-x) - .04em); top: clamp(2px, .6vw, 12px);
   font: 500 clamp(110px, 19vw, 290px)/1 var(--serif);
   letter-spacing: -.07em;
   color: transparent;
-  -webkit-text-stroke: 1.2px rgba(140, 230, 248, .075);
+  -webkit-text-stroke: 1.1px rgba(140, 230, 248, .052);
   pointer-events: none;
   user-select: none;
 }
