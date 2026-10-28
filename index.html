@@ -3,14 +3,32 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#05080f">
-<meta name="description" content="PHANTASMAGORIA — интерактивный фан-сайт альбома MZLFF.">
-<meta property="og:type" content="website"><meta property="og:title" content="MZLFF / PHANTASMAGORIA"><meta property="og:description" content="Интерактивный фан-сайт альбома PHANTASMAGORIA: плеер, синхронный текст, история и тур."><meta property="og:image" content="assets/og.jpg"><meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/png" href="assets/favicon.png"><link rel="apple-touch-icon" href="assets/favicon.png">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#04070d">
+<meta name="description" content="PHANTASMAGORIA — интерактивный фан-сайт альбома MZLFF: восемь треков, синхронный текст, история парка, герои и тур.">
+<meta name="author" content="Cnizroman">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MZLFF / PHANTASMAGORIA">
+<meta property="og:title" content="MZLFF / PHANTASMAGORIA">
+<meta property="og:description" content="Интерактивный фан-сайт альбома PHANTASMAGORIA: плеер, синхронный текст, история и тур.">
+<meta property="og:image" content="assets/og.jpg">
+<meta property="og:image:alt" content="Обложка альбома PHANTASMAGORIA: Нюта и мишка за стеклом">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MZLFF / PHANTASMAGORIA">
+<meta name="twitter:description" content="Восемь аттракционов, один маршрут. Слушай историю с синхронным текстом.">
+<meta name="twitter:image" content="assets/og.jpg">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/favicon.png">
 <title>MZLFF / PHANTASMAGORIA</title>
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/manrope-cyrillic-wght-normal.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/playfair-display-cyrillic-wght-normal.woff2" crossorigin>
 <link rel="stylesheet" href="fonts.css">
-<link rel="preload" as="image" href="assets/cover.jpg">
+<link rel="preload" as="image" href="assets/cover.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="assets/scene-karusel.jpg">
 <link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"MusicAlbum","name":"PHANTASMAGORIA","byArtist":{"@type":"MusicGroup","name":"MZLFF"},"datePublished":"2025-09-26","numTracks":8,"albumProductionType":"StudioAlbum","genre":["хип-хоп","концептуальный альбом"],"description":"Концептуальный альбом MZLFF о парке развлечений, памяти и расплате."}
+</script>
 </head>
 <body>
 <svg class="icon-sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
@@ -21,15 +39,16 @@
   <symbol id="icon-shuffle" viewBox="0 0 24 24"><path d="M4 7h3c5 0 5 10 10 10h3m-3-3 3 3-3 3M4 17h3c1.8 0 2.9-1.2 4-3m2-4c1.1-1.8 2.2-3 4-3h3m-3-3 3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="icon-repeat" viewBox="0 0 24 24"><path d="M18 8H7a4 4 0 0 0-4 4m3-7L3 8l3 3m0 5h11a4 4 0 0 0 4-4m-3 7 3-3-3-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="icon-volume" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4zm12-1a5 5 0 0 1 0 8m2-11a9 9 0 0 1 0 14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-up" viewBox="0 0 24 24"><path d="M12 19V6m-6 6 6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M6 18 18 6M9 6h9v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </svg>
 <a class="skip" href="#top">К содержимому</a>
-<div class="site-noise"></div>
-<div class="glow glow-a"></div><div class="glow glow-b"></div>
-<div class="paper-scrap scrap-a">PHANTASMAGORIA<br><span>ADMIT ONE</span></div>
-<div class="paper-scrap scrap-b">Здесь<br>всё<br>ненастоящее.</div>
+<div class="site-noise" aria-hidden="true"></div>
+<div class="ambient" aria-hidden="true"><span class="glow glow-a"></span><span class="glow glow-b"></span><span class="glow glow-c"></span></div>
 
 <header class="topbar">
-  <a class="brand" href="#top"><strong>MZLFF</strong><i>/</i><span>PHANTASMAGORIA</span></a>
+  <div class="scroll-progress" aria-hidden="true"><i id="scrollBar"></i></div>
+  <a class="brand" href="#top" aria-label="MZLFF / PHANTASMAGORIA — наверх"><strong>MZLFF</strong><i aria-hidden="true">/</i><span>PHANTASMAGORIA</span></a>
   <nav id="nav" aria-label="Основная навигация">
     <a href="#album">альбом</a>
     <a href="#story">история</a>
@@ -39,84 +58,176 @@
     <a href="#tour">тур</a>
     <a href="#sources">источники</a>
   </nav>
-  <button class="nav-toggle" aria-label="Открыть меню" aria-expanded="false" aria-controls="nav">☰</button>
+  <a class="nav-listen" href="#listen"><span aria-hidden="true">▸</span> слушать</a>
+  <button class="nav-toggle" aria-label="Открыть меню" aria-expanded="false" aria-controls="nav"><span></span><span></span><span></span></button>
 </header>
 
 <main id="top">
   <section class="opening" id="album">
-    <aside class="album-rail">
-      <div class="rail-label">MZLFF / 2025</div>
-      <div class="cover-frame">
-        <span class="cover-mark">★</span>
-        <img src="assets/cover.jpg" alt="Обложка PHANTASMAGORIA" width="881" height="881" fetchpriority="high">
-        <div class="cover-stamp">PHANTASMAGORIA<br><small>PARK OF ATTRACTIONS</small></div>
-      </div>
-      <h1>PHANTASMAGORIA</h1>
-      <p class="artist-name">MZLFF</p>
-      <p class="rail-copy">Концептуальный альбом, превращающий парк развлечений в странное путешествие по памяти, страху, взрослению и последствиям.</p>
-      <div class="rail-meta"><span>26.09.2025</span><span>08 TRACKS</span><span>23 MIN.</span></div>
-      <div class="rail-note">Билет действителен<br>только в одну сторону.</div>
-    </aside>
-
-    <div class="opening-main">
-      <div class="eyebrow"><span>01 / ВХОД</span><span>THE FENCE</span></div>
-      <div class="hero-copy">
-        <p class="kicker">ПАРК, ГДЕ МЕЧТЫ СТАНОВЯТСЯ КОШМАРАМИ</p>
-        <h2>Добро<br><em>пожаловать.</em></h2>
-        <p class="hero-text">Сначала здесь праздник. Потом появляются зеркала, карусели, игрушки и ощущение, что аттракционы знают о тебе слишком много.</p>
-        <div class="hero-actions"><a class="btn" href="#listen">СЛУШАТЬ</a><a class="line-button" href="#story">ИСТОРИЯ ↓</a></div>
-      </div>
-      <div class="hero-bottom">
-        <div class="scribble">Не задерживайся<br>после закрытия.</div>
-        <div class="hero-ticket"><span>ВХОДНОЙ БИЛЕТ</span><b>08 / 08</b><small>ОДНА ИСТОРИЯ · ВОСЕМЬ ТРЕКОВ</small></div>
-      </div>
+    <div class="opening-art" aria-hidden="true">
+      <div class="art-photo"></div>
+      <div class="art-grade"></div>
+      <div class="beams"><i></i><i></i><i></i></div>
+      <div class="hero-spot" id="heroSpot"></div>
+      <div class="art-copy"><span>THE PARK · PARK OF ATTRACTIONS</span><b>PHANTASMAGORIA</b><small>NO EXIT / NO REFUND</small></div>
     </div>
 
-    <div class="opening-art">
-      <div class="art-overlay"></div>
-      <div class="art-copy"><span>THE PARK</span><b>PHANTASMAGORIA</b><small>NO EXIT / NO REFUND</small></div>
+    <div class="opening-inner">
+      <div class="eyebrow">
+        <span>01 / ВХОД</span>
+        <span class="eyebrow-mid">THE FENCE · 26.09.2025</span>
+        <span>БИЛЕТ 08 / 08</span>
+      </div>
+
+      <div class="hero-grid">
+        <aside class="album-rail">
+          <h1>PHANTASMAGORIA</h1>
+          <p class="artist-name">MZLFF <span aria-hidden="true">·</span> 2025</p>
+          <div class="sleeve">
+            <div class="disc" aria-hidden="true"><i></i></div>
+            <div class="cover-frame">
+              <span class="cover-mark" aria-hidden="true">★</span>
+              <img src="assets/cover.jpg" alt="Обложка PHANTASMAGORIA" width="881" height="881" fetchpriority="high" decoding="async">
+              <div class="cover-stamp">PHANTASMAGORIA<br><small>PARK OF ATTRACTIONS</small></div>
+              <span class="cover-corner" aria-hidden="true">ADMIT<br>ONE</span>
+            </div>
+          </div>
+          <div class="rail-meta">
+            <span><b>26.09.2025</b> релиз</span>
+            <span><b>08</b> треков</span>
+            <span><b>23</b> минуты</span>
+          </div>
+          <p class="rail-copy">Концептуальный альбом, превращающий парк развлечений в странное путешествие по памяти, страху, взрослению и последствиям.</p>
+        </aside>
+
+        <div class="hero-copy">
+          <p class="kicker">ПАРК, ГДЕ МЕЧТЫ СТАНОВЯТСЯ КОШМАРАМИ</p>
+          <h2 class="hero-title"><span>Добро</span><em>пожаловать.</em></h2>
+          <p class="hero-text">Сначала здесь праздник. Потом появляются зеркала, карусели, игрушки и ощущение, что аттракционы знают о тебе слишком много.</p>
+          <div class="hero-actions">
+            <a class="btn" href="#listen">ВКЛЮЧИТЬ АЛЬБОМ <span class="btn-arrow" aria-hidden="true">▸</span></a>
+            <a class="line-button" href="#story">ИСТОРИЯ <span aria-hidden="true">↓</span></a>
+          </div>
+          <div class="hero-platforms">
+            <span>СЛУШАТЬ НА</span>
+            <a href="https://open.spotify.com/album/3tZNBj3xEJcpzgmI3xdENj" target="_blank" rel="noreferrer">SPOTIFY</a>
+            <a href="https://music.apple.com/ru/album/phantasmagoria/1839170497" target="_blank" rel="noreferrer">APPLE MUSIC</a>
+            <a href="https://www.youtube.com/watch?v=JFHYBcEt4mg" target="_blank" rel="noopener noreferrer">YOUTUBE</a>
+          </div>
+        </div>
+
+        <div class="hero-aside">
+          <div class="scrap-note" aria-hidden="true">Здесь<br>всё<br>ненастоящее.</div>
+          <div class="hero-ticket">
+            <div class="ticket-top"><span>ВХОДНОЙ БИЛЕТ</span><span>№ 0025</span></div>
+            <b>08 / 08</b>
+            <div class="ticket-barcode" aria-hidden="true"></div>
+            <small>ОДНА ИСТОРИЯ · ВОСЕМЬ ТРЕКОВ</small>
+            <span class="ticket-end">THE FENCE · PARK OF ATTRACTIONS</span>
+          </div>
+          <div class="scribble">Не задерживайся<br>после закрытия.</div>
+        </div>
+      </div>
+
+      <div class="hero-foot">
+        <a class="scroll-cue" href="#story"><span class="cue-line" aria-hidden="true"></span> ЛИСТАЙ ВНИЗ</a>
+        <div class="hero-credits">ВИЗУАЛ: ЛЕГАВАЯ × SANYAUNIQ</div>
+      </div>
     </div>
   </section>
 
-  <section class="story section-frame reveal" id="story">
-    <div class="section-number">02 / ИСТОРИЯ</div>
-    <div class="section-title"><h2>За праздничным<br><em>фасадом.</em></h2><p>Девочка Нюта гуляет по парку аттракционов, где людей затягивает внутрь каруселей, оживают игрушки, а из кривых зеркал кто-то зовёт на помощь. Альбом выходит как цельная история на 8 треков.</p></div>
-    <div class="story-grid">
-      <article><span>01</span><h3>ПАРК</h3><p>Карусели, зеркала и игрушки складываются в один непрерывный маршрут. Каждый следующий аттракцион выглядит всё менее безопасным.</p></article>
-      <article><span>02</span><h3>НЮТА</h3><p>Через её путешествие сюжет показывает место, в котором детское любопытство соседствует со страхом и невозможностью просто уйти.</p></article>
-      <article><span>03</span><h3>МЕТАФОРА</h3><p>Парк можно читать как образ жизни, психики и взросления. Альбом не закрывает трактовку одним объяснением.</p></article>
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>БИЛЕТ ДЕЙСТВИТЕЛЕН ТОЛЬКО В ОДНУ СТОРОНУ <i>✦</i> ВОСЕМЬ АТТРАКЦИОНОВ <i>✦</i> ОДНА ИСТОРИЯ <i>✦</i> НЕТ ВЫХОДА <i>✦</i> НЕТ ВОЗВРАТА <i>✦</i> НЕ ЗАДЕРЖИВАЙСЯ ПОСЛЕ ЗАКРЫТИЯ <i>✦</i></span>
+      <span>БИЛЕТ ДЕЙСТВИТЕЛЕН ТОЛЬКО В ОДНУ СТОРОНУ <i>✦</i> ВОСЕМЬ АТТРАКЦИОНОВ <i>✦</i> ОДНА ИСТОРИЯ <i>✦</i> НЕТ ВЫХОДА <i>✦</i> НЕТ ВОЗВРАТА <i>✦</i> НЕ ЗАДЕРЖИВАЙСЯ ПОСЛЕ ЗАКРЫТИЯ <i>✦</i></span>
     </div>
+  </div>
+
+  <section class="story section-frame reveal" id="story">
+    <header class="chapter">
+      <div class="chapter-index"><span>02</span><i aria-hidden="true"></i></div>
+      <div class="chapter-copy">
+        <span class="chapter-kicker">ИСТОРИЯ</span>
+        <h2>За праздничным<br><em>фасадом.</em></h2>
+      </div>
+      <p class="chapter-lead">Девочка Нюта гуляет по парку аттракционов, где людей затягивает внутрь каруселей, оживают игрушки, а из кривых зеркал кто-то зовёт на помощь. Альбом выходит как цельная история на 8 треков.</p>
+    </header>
+
+    <div class="story-body">
+      <div class="story-collage" aria-hidden="true">
+        <figure class="collage-photo collage-a"><img src="assets/art-nyuta.jpg" alt="" width="640" height="640" loading="lazy" decoding="async"><figcaption>НЮТА · КАДР ИЗ ВИДЕО</figcaption></figure>
+        <figure class="collage-photo collage-b"><img src="assets/art-bear.jpg" alt="" width="640" height="623" loading="lazy" decoding="async"><figcaption>МИШКА · PARK OF ATTRACTIONS</figcaption></figure>
+        <figure class="collage-photo collage-c"><img src="assets/art-ghost-l.jpg" alt="" width="400" height="640" loading="lazy" decoding="async"><figcaption>ЗА СТЕКЛОМ</figcaption></figure>
+      </div>
+
+      <div class="story-grid">
+        <article><span class="card-index">01</span><h3>ПАРК</h3><p>Карусели, зеркала и игрушки складываются в один непрерывный маршрут. Каждый следующий аттракцион выглядит всё менее безопасным.</p></article>
+        <article><span class="card-index">02</span><h3>НЮТА</h3><p>Через её путешествие сюжет показывает место, в котором детское любопытство соседствует со страхом и невозможностью просто уйти.</p></article>
+        <article><span class="card-index">03</span><h3>МЕТАФОРА</h3><p>Парк можно читать как образ жизни, психики и взросления. Альбом не закрывает трактовку одним объяснением.</p></article>
+      </div>
+    </div>
+
     <div class="plot" id="plot"></div>
-    <div class="story-quote">«Праздник продолжается,<br>даже когда тебе уже не весело.»</div>
+
+    <blockquote class="story-quote"><span aria-hidden="true">«</span>Праздник продолжается,<br>даже когда тебе уже не весело.<span aria-hidden="true">»</span></blockquote>
   </section>
 
   <section class="chars section-frame reveal" id="chars">
-    <div class="section-number">02.5 / ПЕРСОНАЖИ</div>
-    <div class="section-title"><h2>Кто<br><em>в парке.</em></h2><p>Знакомые лица за фасадом парка. Кадры — из официальных анимационных видео; описания по текстам песен и отзывам слушателей, это прочтение, а не официальный канон.</p></div>
+    <header class="chapter chapter--center">
+      <div class="chapter-index"><span>03</span><i aria-hidden="true"></i></div>
+      <div class="chapter-copy">
+        <span class="chapter-kicker">ПЕРСОНАЖИ</span>
+        <h2>Кто <em>в парке.</em></h2>
+      </div>
+      <p class="chapter-lead">Знакомые лица за фасадом парка. Кадры — из официальных анимационных видео; описания по текстам песен и отзывам слушателей: это прочтение, а не официальный канон.</p>
+    </header>
     <div class="char-grid" id="charGrid"></div>
-    <p class="art-credit">ВИЗУАЛЫ АЛЬБОМА: ЛЕГАВАЯ × SANYAUNIQ · КАДРЫ ИЗ ВИДЕО MZLFF</p>
-    <p class="note">Слово «фантасмагория» пришло из XVIII века: так называли театральные шоу, где с помощью оптики и проекций показывали призраков и движущиеся образы. Точнее для этого парка название не придумать.</p>
+    <div class="chars-foot">
+      <p class="art-credit">ВИЗУАЛЫ АЛЬБОМА: ЛЕГАВАЯ × SANYAUNIQ · КАДРЫ ИЗ ВИДЕО MZLFF</p>
+      <p class="note">Слово «фантасмагория» пришло из XVIII века: так называли театральные шоу, где с помощью оптики и проекций показывали призраков и движущиеся образы. Точнее для этого парка название не придумать.</p>
+    </div>
   </section>
 
   <section class="tracks section-frame reveal" id="tracks">
-    <div class="section-number">03 / ТРЕКЛИСТ</div>
-    <div class="section-title"><h2>Восемь<br><em>аттракционов.</em></h2><p>Выбирай остановку. Музыка, обложка и синхронизированный текст переключаются вместе.</p></div>
+    <header class="chapter">
+      <div class="chapter-index"><span>04</span><i aria-hidden="true"></i></div>
+      <div class="chapter-copy">
+        <span class="chapter-kicker">ТРЕКЛИСТ</span>
+        <h2>Восемь<br><em>аттракционов.</em></h2>
+      </div>
+      <div class="tracks-side">
+        <p class="chapter-lead">Выбирай остановку. Музыка, обложка и синхронизированный текст переключаются вместе.</p>
+        <div class="tracks-stats"><span><b>08</b> треков</span><span><b>23:23</b> звучания</span><span><b id="heardCount">00 / 08</b> пройдено</span></div>
+      </div>
+    </header>
+    <div class="track-list-head" aria-hidden="true"><span>№</span><span>ОСТАНОВКА</span><span>ДЛИТЕЛЬНОСТЬ</span><span>ПЕРЕЙТИ</span></div>
     <div id="trackList" class="track-list"></div>
+    <p class="tracks-hint">Нажми на строку — плеер перескочит к этой остановке и включит её. Текст справа синхронизируется автоматически.</p>
   </section>
 
   <section class="listen section-frame reveal" id="listen">
-    <div class="section-number">04 / СЛУШАТЬ</div>
-    <div class="listen-intro">
-      <div><span class="listen-kicker">THE SOUND OF THE PARK</span><h2>Слушай <em>историю.</em></h2></div>
+    <div class="listen-stage" aria-hidden="true"></div>
+    <header class="listen-intro">
+      <div>
+        <span class="listen-kicker">05 / THE SOUND OF THE PARK</span>
+        <h2>Слушай <em>историю.</em></h2>
+      </div>
       <p>Восемь глав, один маршрут. Выбери трек и нажми на строку текста, чтобы перейти к нужному моменту.</p>
-    </div>
+    </header>
     <div class="player-layout">
       <div class="player-column">
         <div class="player-card">
-          <div class="player-topline"><span>ПЛЕЕР / MZLFF</span><span id="trackCounter">01 / 08</span></div>
+          <div class="player-topline"><span>ПЛЕЕР · MZLFF / PHANTASMAGORIA</span><span id="trackCounter">01 / 08</span></div>
           <div class="player-heading">
-            <div class="mini-cover"><img id="nowCover" src="assets/cover.jpg" alt="Обложка текущего трека" width="128" height="128"></div>
-            <div class="player-heading-copy"><span class="tiny-label">СЕЙЧАС ИГРАЕТ</span><h3 id="nowTitle">мало-помалу</h3><p id="nowDesc">Вход в парк: праздничный фасад и первые признаки того, что за весельем скрывается нечто совсем другое.</p></div>
+            <div class="mini-cover">
+              <div class="disc" aria-hidden="true"></div>
+              <img id="nowCover" src="assets/cover.jpg" alt="Обложка текущего трека" width="128" height="128" decoding="async">
+            </div>
+            <div class="player-heading-copy">
+              <span class="tiny-label">СЕЙЧАС ИГРАЕТ <i class="led" aria-hidden="true"></i></span>
+              <h3 id="nowTitle">мало-помалу</h3>
+              <p id="nowDesc">Вход в парк: праздничный фасад и первые признаки того, что за весельем скрывается нечто совсем другое.</p>
+            </div>
           </div>
           <div class="source-switch"><span>ИСТОЧНИК</span><div role="group" aria-label="Источник воспроизведения"><button type="button" id="sourceAudio" aria-pressed="true">АУДИО</button><button type="button" id="sourceVideo" aria-pressed="false">ВИДЕО</button></div></div>
           <div class="video-panel" id="videoPanel" hidden>
@@ -137,8 +248,13 @@
             <div class="player-status" id="playerStatus" role="status"><span class="status-dot"></span><span id="statusText">Готово к прослушиванию</span></div>
           </div>
           <div class="player-error" id="playerError" hidden><p id="errorText"></p><div><button type="button" id="retry">Попробовать снова</button><button type="button" id="errorVideo">Включить видео</button><a id="errorLink" href="https://www.youtube.com/watch?v=HIl0jzLga58" target="_blank" rel="noopener noreferrer">Открыть YouTube ↗</a></div></div>
-          <div class="player-links"><a id="videoLink" href="https://www.youtube.com/watch?v=HIl0jzLga58" target="_blank" rel="noopener noreferrer">ОФИЦИАЛЬНОЕ ВИДЕО ↗</a><button type="button" id="shareTrack">СКОПИРОВАТЬ ССЫЛКУ ↗</button></div>
+          <div class="player-links">
+            <span class="up-next">ДАЛЕЕ · <b id="nextTitle">медленный танец</b></span>
+            <a id="videoLink" href="https://www.youtube.com/watch?v=HIl0jzLga58" target="_blank" rel="noopener noreferrer">ОФИЦИАЛЬНОЕ ВИДЕО ↗</a>
+            <button type="button" id="shareTrack">СКОПИРОВАТЬ ССЫЛКУ ↗</button>
+          </div>
           <details class="story-details"><summary><span>СЮЖЕТ ЭТОЙ ГЛАВЫ</span><span aria-hidden="true">+</span></summary><div class="story-box" id="storyBox"></div></details>
+          <p class="keys-hint"><kbd>ПРОБЕЛ</kbd> пауза <span aria-hidden="true">·</span> <kbd>←</kbd><kbd>→</kbd> треки <span aria-hidden="true">·</span> <kbd>M</kbd> звук</p>
           <audio id="audio" preload="none"></audio>
         </div>
       </div>
@@ -152,23 +268,64 @@
   </section>
 
   <section class="artist section-frame reveal" id="artist">
-    <div class="section-number">05 / MZLFF</div>
+    <header class="chapter">
+      <div class="chapter-index"><span>06</span><i aria-hidden="true"></i></div>
+      <div class="chapter-copy">
+        <span class="chapter-kicker">MZLFF</span>
+        <h2>От баттлов<br><em>к большим мирам.</em></h2>
+      </div>
+    </header>
     <div class="artist-grid">
-      <div class="artist-image"><img src="assets/artist.jpg" alt="MZLFF" loading="lazy" width="964" height="1280"></div>
-      <div class="artist-info"><span class="tiny-label">ИСТОРИЯ АРТИСТА</span><h2>От баттлов<br><em>к большим мирам.</em></h2><p>MZLFF — музыкант, стример и баттл-рэпер. Его ранний путь связан с интернет-культурой, стримами и баттл-рэпом, а затем постепенно сместился к самостоятельным альбомам и масштабным концептуальным проектам.</p><p>PHANTASMAGORIA продолжает эту линию: музыка здесь работает вместе с визуалами, персонажами и концертной постановкой.</p>
-        <div class="timeline"><div><b>2018</b><span>первые релизы / баттлы</span></div><div><b>2019</b><span>«Ничего плохого»</span></div><div><b>2022</b><span>«к маяку вселенной»</span></div><div><b>2024</b><span>«светлая сторона»</span></div><div><b>2025</b><span>ADHD → PHANTASMAGORIA</span></div></div>
+      <div class="artist-image"><img src="assets/artist.jpg" alt="MZLFF" loading="lazy" width="964" height="1280" decoding="async"><span class="photo-tape" aria-hidden="true"></span></div>
+      <div class="artist-info">
+        <span class="tiny-label">ИСТОРИЯ АРТИСТА</span>
+        <p class="artist-lead">MZLFF — музыкант, стример и баттл-рэпер. Его ранний путь связан с интернет-культурой, стримами и баттл-рэпом, а затем постепенно сместился к самостоятельным альбомам и масштабным концептуальным проектам.</p>
+        <p>PHANTASMAGORIA продолжает эту линию: музыка здесь работает вместе с визуалами, персонажами и концертной постановкой.</p>
+        <div class="timeline">
+          <div><b>2018</b><span>первые релизы / баттлы</span></div>
+          <div><b>2019</b><span>«Ничего плохого»</span></div>
+          <div><b>2022</b><span>«к маяку вселенной»</span></div>
+          <div><b>2024</b><span>«светлая сторона»</span></div>
+          <div class="is-now"><b>2025</b><span>ADHD → PHANTASMAGORIA</span></div>
+        </div>
       </div>
     </div>
   </section>
 
   <section class="tour section-frame reveal" id="tour">
-    <div class="section-number">06 / PHANTASMAGORIA TOUR</div>
-    <div class="tour-grid"><div class="tour-poster-large"><img src="assets/poster.jpg" alt="Официальный постер PHANTASMAGORIA TOUR" loading="lazy"></div><div class="tour-copy"><span class="tiny-label">THE PARK LEAVES THE SCREEN</span><h2>Парк вышел<br><em>из экрана.</em></h2><p>Осенью 2025 концертные площадки превращались в парк развлечений PHANTASMAGORIA. Тур соединял песни альбома с общей атмосферой его мира.</p><p>Здесь оставлен официальный постер как документ эпохи релиза, а не отдельная «галерея»: визуал встроен прямо в историю тура.</p><a class="btn" href="https://t.me/tour_mzlff" target="_blank" rel="noreferrer">ОФИЦИАЛЬНЫЙ ТУР ↗</a></div></div>
+    <div class="tour-glow" aria-hidden="true"></div>
+    <header class="chapter">
+      <div class="chapter-index"><span>07</span><i aria-hidden="true"></i></div>
+      <div class="chapter-copy">
+        <span class="chapter-kicker">PHANTASMAGORIA TOUR</span>
+        <h2>Парк вышел<br><em>из экрана.</em></h2>
+      </div>
+    </header>
+    <div class="tour-grid">
+      <div class="tour-poster-large">
+        <div class="bulbs" aria-hidden="true"></div>
+        <img src="assets/poster.jpg" alt="Официальный постер PHANTASMAGORIA TOUR" loading="lazy" width="1200" height="1199" decoding="async">
+        <span class="poster-caption">MZLFF.TOURS · ОФИЦИАЛЬНЫЙ ПОСТЕР</span>
+      </div>
+      <div class="tour-copy">
+        <span class="tiny-label">THE PARK LEAVES THE SCREEN</span>
+        <p class="tour-lead">Осенью 2025 концертные площадки превращались в парк развлечений PHANTASMAGORIA. Тур соединял песни альбома с общей атмосферой его мира.</p>
+        <p>Здесь оставлен официальный постер как документ эпохи релиза, а не отдельная «галерея»: визуал встроен прямо в историю тура.</p>
+        <div class="tour-facts"><span><b>26</b> городов</span><span><b>окт—дек</b> 2025</span><span><b>18+</b> атмосфера</span></div>
+        <a class="btn" href="https://t.me/tour_mzlff" target="_blank" rel="noreferrer">ОФИЦИАЛЬНЫЙ ТУР <span class="btn-arrow" aria-hidden="true">↗</span></a>
+      </div>
+    </div>
   </section>
 
   <section class="sources section-frame reveal" id="sources">
-    <div class="section-number">07 / ИСТОЧНИКИ</div>
-    <div class="sources-heading"><h2>Документы<br><em>путешествия.</em></h2><p>Ссылки на материалы, использованные для фактической части сайта.</p></div>
+    <header class="chapter">
+      <div class="chapter-index"><span>08</span><i aria-hidden="true"></i></div>
+      <div class="chapter-copy">
+        <span class="chapter-kicker">ИСТОЧНИКИ</span>
+        <h2>Документы<br><em>путешествия.</em></h2>
+      </div>
+      <p class="chapter-lead">Ссылки на материалы, использованные для фактической части сайта.</p>
+    </header>
     <div class="source-list">
       <a href="https://the-flow.ru/releases/mzlff-phantasmagoria" target="_blank" rel="noreferrer"><span>01</span><b>THE FLOW</b><small>концепция, сюжет, релиз</small><i>↗</i></a>
       <a href="https://open.spotify.com/album/3tZNBj3xEJcpzgmI3xdENj" target="_blank" rel="noreferrer"><span>02</span><b>SPOTIFY</b><small>треклист и длительности</small><i>↗</i></a>
@@ -182,7 +339,20 @@
   </section>
 </main>
 
-<footer><div><strong>MZLFF / PHANTASMAGORIA</strong><span>ремейк Cnizroman · 2026</span></div><div>NO EXIT / NO REFUND</div></footer>
+<footer>
+  <div class="footer-top">
+    <div class="footer-mark"><strong>MZLFF</strong><i aria-hidden="true">/</i><span>PHANTASMAGORIA</span></div>
+    <p class="footer-note">Неофициальный фан-проект. Права на музыку, видео и изображения принадлежат правообладателям.</p>
+  </div>
+  <div class="footer-grid">
+    <div><span>РАЗДЕЛЫ</span><a href="#story">история</a><a href="#chars">герои</a><a href="#tracks">треклист</a><a href="#listen">плеер</a></div>
+    <div><span>ПЛОЩАДКИ</span><a href="https://open.spotify.com/album/3tZNBj3xEJcpzgmI3xdENj" target="_blank" rel="noreferrer">spotify ↗</a><a href="https://music.apple.com/ru/album/phantasmagoria/1839170497" target="_blank" rel="noreferrer">apple music ↗</a><a href="https://www.youtube.com/watch?v=JFHYBcEt4mg" target="_blank" rel="noopener noreferrer">youtube ↗</a><a href="https://t.me/tour_mzlff" target="_blank" rel="noreferrer">tour ↗</a></div>
+    <div><span>О ПРОЕКТЕ</span><a href="#sources">источники</a><a href="https://github.com/Cnizroman/PHANTASMAGORIA" target="_blank" rel="noreferrer">github ↗</a><a href="#top">наверх ↑</a></div>
+    <div class="footer-stamp" aria-hidden="true"><b>NO EXIT</b><span>NO REFUND</span><small>PARK OF ATTRACTIONS · 2025—2026</small></div>
+  </div>
+  <div class="footer-bottom"><span>ремейк Cnizroman · 2026</span><span>PHANTASMAGORIA · MZLFF</span></div>
+</footer>
+
 <div class="mini-player" id="miniPlayer" hidden aria-label="Мини-плеер">
   <div class="mini-progress" aria-hidden="true"><span id="miniProgress"></span></div>
   <a class="mini-info" href="#listen"><img id="miniCover" src="assets/cover.jpg" alt="" width="42" height="42"><span><small>СЕЙЧАС ИГРАЕТ</small><b id="miniTitle">мало-помалу</b></span></a>
@@ -191,10 +361,12 @@
   <button type="button" id="miniNext" aria-label="Следующий трек"><svg aria-hidden="true"><use href="#icon-next"></use></svg></button>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<button class="to-top" id="toTop" type="button" aria-label="Наверх" title="Наверх" hidden><svg aria-hidden="true"><use href="#icon-up"></use></svg></button>
 <noscript><p class="no-script">Для плеера и текста нужен JavaScript. Альбом можно послушать <a href="https://www.youtube.com/watch?v=HIl0jzLga58">на YouTube</a>.</p></noscript>
 <script src="lyrics.js" defer></script>
 <script src="story.js" defer></script>
 <script src="player-core.js" defer></script>
 <script src="script.js" defer></script>
+<script src="scene.js" defer></script>
 </body>
 </html>

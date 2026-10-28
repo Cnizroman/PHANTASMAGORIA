@@ -24,6 +24,10 @@ const store = {
   get(key, fallback) { try { return localStorage.getItem(key) ?? fallback; } catch (_) { return fallback; } },
   set(key, value) { try { localStorage.setItem(key, String(value)); } catch (_) { /* private mode */ } }
 };
+const HEARD_KEY = 'ph:heard:v1';
+let heard = {};
+try { heard = JSON.parse(store.get(HEARD_KEY, '{}')) || {}; } catch (_) { heard = {}; }
+if (!heard || typeof heard !== 'object') heard = {};
 const escapeHTML = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const reducedMotion = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 const scrollBehavior = () => reducedMotion() ? 'auto' : 'smooth';
@@ -64,13 +68,44 @@ function renderTracks() {
   list.innerHTML = tracks.map((track, index) => `
     <button class="track" type="button" data-i="${index}">
       <span class="track-no">${String(track.n).padStart(2, '0')}</span>
-      <span class="track-copy"><span class="track-name">${escapeHTML(track.title)}</span><span class="track-desc">${escapeHTML(track.desc)}</span></span>
-      <span class="track-time">${formatTime(track.seconds)}</span><span class="track-go">СЛУШАТЬ <span aria-hidden="true">↗</span></span>
+      <span class="track-copy"><span class="track-name">${escapeHTML(track.title)}</span><span class="track-progress" aria-hidden="true"><i></i></span><span class="track-desc">${escapeHTML(track.desc)}</span></span>
+      <span class="track-time">${formatTime(track.seconds)}</span><span class="track-go"><span class="go-label">СЛУШАТЬ </span><span aria-hidden="true">↗</span></span>
     </button>`).join('');
   $$('.track').forEach(button => button.addEventListener('click', () => {
     loadTrack(Number(button.dataset.i), true);
     $('#listen').scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
   }));
+  paintHeard();
+}
+
+// How far the visitor has travelled through each stop is remembered locally,
+// so the tracklist can double as a map of the album.
+function paintHeard() {
+  let done = 0;
+  $$('.track').forEach((element, index) => {
+    const value = Math.max(0, Math.min(1, Number(heard[tracks[index].key]) || 0));
+    if (value >= 0.9) done++;
+    const bar = element.querySelector('.track-progress i');
+    if (bar) bar.style.width = `${Math.round(value * 100)}%`;
+    element.classList.toggle('heard', value >= 0.9);
+    element.classList.toggle('heard-part', value > 0 && value < 0.9);
+  });
+  const counter = $('#heardCount');
+  if (counter) counter.textContent = `${String(done).padStart(2, '0')} / 08`;
+}
+
+function recordHeard() {
+  const duration = getDuration();
+  const position = getPosition();
+  if (!Number.isFinite(duration) || duration <= 0 || !Number.isFinite(position)) return;
+  const fraction = clamp(position / duration, 0, 1);
+  const key = tracks[current].key;
+  const previous = Number(heard[key]) || 0;
+  const next = Math.round(fraction * 100) / 100;
+  if (next <= previous) return;
+  heard[key] = next;
+  store.set(HEARD_KEY, JSON.stringify(heard));
+  paintHeard();
 }
 
 function renderPlot() {
@@ -206,6 +241,8 @@ function updatePlayButtons() {
     button.title = label;
   }
   $('#viz').classList.toggle('is-playing', desiredPlaying);
+  const card = $('.player-card');
+  if (card) card.classList.toggle('is-playing', desiredPlaying);
   if ('mediaSession' in navigator) {
     try { navigator.mediaSession.playbackState = desiredPlaying ? 'playing' : 'paused'; } catch (_) { /* unsupported */ }
   }
@@ -276,11 +313,13 @@ function updateTime(forceLyrics = false) {
   const duration = getDuration();
   const position = clamp(getPosition(), 0, duration);
   if (!draggingSeek) seek.value = duration ? Math.round(position / duration * 1000) : 0;
+  seek.style.setProperty('--p', `${duration ? (position / duration) * 100 : 0}%`);
   seek.setAttribute('aria-valuetext', `${formatTime(position)} из ${formatTime(duration)}`);
   $('#currentTime').textContent = formatTime(position);
   $('#duration').textContent = formatTime(duration);
   $('#miniTime').textContent = formatTime(position);
   $('#miniProgress').style.width = `${duration ? position / duration * 100 : 0}%`;
+  recordHeard();
   updateLyrics(forceLyrics);
   const second = Math.floor(position);
   if (second !== lastMediaSecond && 'mediaSession' in navigator && navigator.mediaSession.setPositionState) {
@@ -317,6 +356,9 @@ function updateTrackUI(track) {
   $('#miniCover').src = track.cover;
   $('#miniTitle').textContent = track.title;
   $('#trackCounter').textContent = `${String(track.n).padStart(2, '0')} / 08`;
+  const following = tracks[(current + 1) % tracks.length];
+  const nextLabel = $('#nextTitle');
+  if (nextLabel) nextLabel.textContent = following.title;
   $('#videoLink').href = videoURL(track);
   $('#errorLink').href = videoURL(track);
   document.title = `${track.title} · MZLFF / PHANTASMAGORIA`;
@@ -647,9 +689,11 @@ $('#repeat').addEventListener('click', event => {
 
 const savedVolume = Number(store.get('ph:vol', 0.8));
 volume.value = String(Math.round(clamp(Number.isFinite(savedVolume) ? savedVolume : 0.8, 0, 1) * 100));
+volume.style.setProperty('--p', `${volume.value}%`);
 audio.volume = Number(volume.value) / 100;
 volume.addEventListener('input', () => {
   const value = Number(volume.value);
+  volume.style.setProperty('--p', `${value}%`);
   audio.volume = value / 100;
   store.set('ph:vol', value / 100);
   if (youtubeReady && youtubePlayer) {
@@ -748,8 +792,28 @@ if ('mediaSession' in navigator) {
 }
 
 addEventListener('keydown', event => {
-  if (!hasStarted || event.altKey || event.ctrlKey || event.metaKey || event.target.closest('input, textarea, select, button, a, [contenteditable]')) return;
-  if (event.code === 'Space') { event.preventDefault(); togglePlayback(); }
+  if (event.altKey || event.ctrlKey || event.metaKey) return;
+  if (event.target.closest('input, textarea, select, button, a, [contenteditable], .lyrics')) return;
+  if (event.code === 'Space') {
+    if (!hasStarted) return;
+    event.preventDefault();
+    togglePlayback();
+    return;
+  }
+  if (event.key === 'ArrowRight') { event.preventDefault(); next(true); return; }
+  if (event.key === 'ArrowLeft') { event.preventDefault(); previous(); return; }
+  if (event.key === 'm' || event.key === 'M' || event.key === 'ь' || event.key === 'Ь') {
+    const muted = Number(volume.value) === 0;
+    if (muted) {
+      const restored = Number(store.get('ph:vol:last', 0.8));
+      volume.value = String(Math.round(clamp(Number.isFinite(restored) ? restored : 0.8, 0.05, 1) * 100));
+    } else {
+      store.set('ph:vol:last', (Number(volume.value) || 80) / 100);
+      volume.value = '0';
+    }
+    volume.dispatchEvent(new Event('input', { bubbles: true }));
+    showToast(muted ? 'Звук включён' : 'Звук выключен');
+  }
 });
 
 /* Navigation, section visibility, and the mini-player. */
