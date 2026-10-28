@@ -241,8 +241,7 @@ function updatePlayButtons() {
     button.title = label;
   }
   $('#viz').classList.toggle('is-playing', desiredPlaying);
-  const card = $('.player-card');
-  if (card) card.classList.toggle('is-playing', desiredPlaying);
+  for (const card of $$('.player-card, .lyrics-card')) card.classList.toggle('is-playing', desiredPlaying);
   if ('mediaSession' in navigator) {
     try { navigator.mediaSession.playbackState = desiredPlaying ? 'playing' : 'paused'; } catch (_) { /* unsupported */ }
   }

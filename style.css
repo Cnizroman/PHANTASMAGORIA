@@ -116,10 +116,11 @@ svg { display: block; }
 .skip:focus { top: 12px; }
 
 .site-noise {
-  position: fixed; inset: -60%;
-  z-index: 60; pointer-events: none; opacity: .05; mix-blend-mode: screen;
+  position: fixed; inset: -18%;
+  z-index: 60; pointer-events: none; opacity: .045; mix-blend-mode: screen;
+  will-change: transform;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
-  animation: grain .9s steps(3) infinite;
+  animation: grain 3.6s steps(6) infinite;
 }
 @keyframes grain {
   0% { transform: translate(0, 0); }
@@ -624,6 +625,28 @@ main { padding-top: var(--bar); }
 .scroll-cue:hover { color: var(--cyan); }
 .hero-credits a { color: inherit; }
 
+@media (prefers-reduced-motion: no-preference) {
+  .opening-inner .eyebrow { animation: rise .8s var(--ease) both; }
+  .album-rail { animation: rise .9s var(--ease) .1s both; }
+  .hero-copy > * { animation: rise .9s var(--ease) both; }
+  .hero-copy > :nth-child(1) { animation-delay: .12s; }
+  .hero-copy > :nth-child(2) { animation-delay: .2s; }
+  .hero-copy > :nth-child(3) { animation-delay: .3s; }
+  .hero-copy > :nth-child(4) { animation-delay: .38s; }
+  .hero-copy > :nth-child(5) { animation-delay: .46s; }
+  .hero-aside { animation: rise .9s var(--ease) .34s both; }
+  .hero-foot { animation: rise .8s var(--ease) .5s both; }
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Only the plain numeral watermark is dropped on narrow screens. */
+@media (max-width: 720px) {
+  .section-frame::before { font-size: clamp(96px, 26vw, 180px); opacity: .7; }
+}
+
 /* 6. Marquee ============================================================== */
 .marquee {
   overflow: hidden;
@@ -649,10 +672,23 @@ main { padding-top: var(--bar); }
 /* 7. Chapters ============================================================= */
 .section-frame {
   position: relative;
+  isolation: isolate;
+  overflow: clip;
   max-width: 1480px;
   margin: 0 auto;
   padding: var(--section-pad) var(--pad-x);
   border-top: 1px solid var(--line-2);
+}
+.section-frame::before {
+  content: attr(data-num);
+  position: absolute; z-index: -1;
+  right: calc(var(--pad-x) - .04em); top: clamp(10px, 1.4vw, 26px);
+  font: 500 clamp(110px, 19vw, 290px)/1 var(--serif);
+  letter-spacing: -.07em;
+  color: transparent;
+  -webkit-text-stroke: 1.2px rgba(140, 230, 248, .075);
+  pointer-events: none;
+  user-select: none;
 }
 .section-frame:first-of-type { border-top: 0; }
 
@@ -1464,8 +1500,10 @@ main { padding-top: var(--bar); }
 .lyrics-live i {
   width: 5px; height: 5px; border-radius: 50%;
   background: #9ff0cf; box-shadow: 0 0 8px rgba(159, 240, 207, .9);
-  animation: blink 2.4s ease-in-out infinite;
 }
+.lyrics-card.is-playing .lyrics-live i { animation: blink 2.4s ease-in-out infinite; }
+.lyrics-card:not(.is-playing) .lyrics-live { color: var(--dim); border-color: var(--line-3); }
+.lyrics-card:not(.is-playing) .lyrics-live i { background: var(--faint); box-shadow: none; }
 
 .lyrics-tools {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -1525,8 +1563,8 @@ main { padding-top: var(--bar); }
   transition: color .25s, background .25s, opacity .35s, border-color .25s;
 }
 .lyric-line:hover { color: var(--ink); background: rgba(140, 230, 248, .05); }
-.lyric-line.past { opacity: .5; }
-.lyric-line.future { opacity: .82; }
+.lyric-line.past { opacity: .46; }
+.lyric-line.future { opacity: .74; }
 .lyric-line.active {
   opacity: 1;
   color: var(--cream);
@@ -1880,6 +1918,7 @@ body.has-mini-player { padding-bottom: 92px; }
   transition: color .22s, border-color .22s, transform .3s var(--ease);
 }
 .to-top svg { width: 16px; height: 16px; }
+body.has-mini-player .to-top { bottom: clamp(104px, 12vh, 124px); }
 .to-top:hover { color: var(--cyan); border-color: var(--cyan); transform: translateY(-3px); }
 
 .no-script {
