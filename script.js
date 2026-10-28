@@ -43,6 +43,8 @@ let lineEls = [];
 let activeIndex = -1;
 let delay = 0;
 let follow = true;
+let lyricsScrollFrame = 0;
+let lyricsEnterTimer = 0;
 let draggingSeek = false;
 let desiredPlaying = false;
 let hasStarted = false;
@@ -170,8 +172,9 @@ function renderLyrics(track) {
     return;
   }
   lyricsBox.innerHTML = lyrics.map((cue, index) => cue.text
-    ? `<button class="lyric-line" type="button" data-index="${index}" title="Перейти к ${formatTime(cue.time)}"><span class="lyric-time" aria-hidden="true">${formatTime(cue.time)}</span><span>${escapeHTML(cue.text)}</span></button>`
-    : `<span class="lyric-break" data-index="${index}" aria-label="Инструментальный фрагмент">✦</span>`).join('');
+    ? `<button class="lyric-line" type="button" data-index="${index}" style="--i:${Math.min(index, 8)}" title="Перейти к ${formatTime(cue.time)}"><span class="lyric-time" aria-hidden="true">${formatTime(cue.time)}</span><span>${escapeHTML(cue.text)}</span></button>`
+    : `<span class="lyric-break" data-index="${index}" style="--i:${Math.min(index, 8)}" aria-label="Инструментальный фрагмент">✦</span>`).join('');
+  playLyricsEntrance();
   lineEls = [...lyricsBox.querySelectorAll('[data-index]')];
   lyricsBox.querySelectorAll('button.lyric-line').forEach(button => button.addEventListener('click', () => {
     const cue = lyrics[Number(button.dataset.index)];
@@ -183,9 +186,52 @@ function renderLyrics(track) {
   updateLyrics(true);
 }
 
+function cancelLyricsScroll() {
+  if (lyricsScrollFrame) { cancelAnimationFrame(lyricsScrollFrame); lyricsScrollFrame = 0; }
+}
+
+// Eased, retargetable scroll so every new line glides in instead of jumping.
+function scrollLyricsTo(target) {
+  const max = Math.max(0, lyricsBox.scrollHeight - lyricsBox.clientHeight);
+  const destination = clamp(target, 0, max);
+  if (reducedMotion()) {
+    cancelLyricsScroll();
+    lyricsBox.scrollTop = destination;
+    return;
+  }
+  const from = lyricsBox.scrollTop;
+  const distance = destination - from;
+  if (Math.abs(distance) < .5) return;
+  const duration = clamp(300 + Math.abs(distance) * .7, 300, 820);
+  const started = performance.now();
+  cancelLyricsScroll();
+  const step = now => {
+    const progress = Math.min(1, (now - started) / duration);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    lyricsBox.scrollTop = from + distance * eased;
+    lyricsScrollFrame = progress < 1 ? requestAnimationFrame(step) : 0;
+  };
+  lyricsScrollFrame = requestAnimationFrame(step);
+}
+
+function playLyricsEntrance() {
+  lyricsBox.classList.remove('is-entering');
+  const heading = document.querySelector('.lyrics-heading');
+  if (heading) heading.classList.remove('is-entering');
+  void lyricsBox.offsetWidth;
+  lyricsBox.classList.add('is-entering');
+  if (heading) heading.classList.add('is-entering');
+  clearTimeout(lyricsEnterTimer);
+  lyricsEnterTimer = setTimeout(() => {
+    lyricsBox.classList.remove('is-entering');
+    if (heading) heading.classList.remove('is-entering');
+  }, 1300);
+}
+
 function setFollow(enabled) {
   follow = enabled;
   $('#followLyrics').hidden = enabled;
+  if (!enabled) cancelLyricsScroll();
 }
 
 function updateLyrics(force = false) {
@@ -197,6 +243,8 @@ function updateLyrics(force = false) {
     element.classList.toggle('active', i === index);
     element.classList.toggle('past', i < index);
     element.classList.toggle('future', i > index);
+    // distance drives the reading spotlight: neighbours glow, the far lines recede
+    element.style.setProperty('--d', index < 0 ? 0 : Math.min(Math.abs(i - index), 9));
     if (element.tagName === 'BUTTON') {
       if (i === index) element.setAttribute('aria-current', 'true');
       else element.removeAttribute('aria-current');
@@ -206,7 +254,7 @@ function updateLyrics(force = false) {
   if (active && follow && !draggingSeek) {
     // Use relative bounding boxes: offsetTop may be relative to a sticky ancestor.
     const delta = active.getBoundingClientRect().top - lyricsBox.getBoundingClientRect().top - (lyricsBox.clientHeight - active.clientHeight) / 2;
-    lyricsBox.scrollTo({ top: lyricsBox.scrollTop + delta, behavior: scrollBehavior() });
+    scrollLyricsTo(lyricsBox.scrollTop + delta);
   }
 }
 
@@ -337,6 +385,8 @@ function updateTime(forceLyrics = false) {
   $('#miniTime').textContent = formatTime(position);
   $('#miniProgress').style.width = `${duration ? position / duration * 100 : 0}%`;
   if (lyricsShell) lyricsShell.style.setProperty('--lyrics-progress', `${duration ? Math.min(100, position / duration * 100) : 0}%`);
+  const viz = $('#viz');
+  if (viz) viz.style.setProperty('--viz-progress', `${duration ? Math.min(100, position / duration * 100) : 0}%`);
   recordHeard();
   updateLyrics(forceLyrics);
   const second = Math.floor(position);
@@ -366,6 +416,14 @@ function setMediaMetadata(track) {
   } catch (_) { /* optional platform integration */ }
 }
 
+function swapPlayerHeading() {
+  const heading = $('.player-heading');
+  if (!heading || reducedMotion()) return;
+  heading.classList.remove('is-swapping');
+  void heading.offsetWidth;
+  heading.classList.add('is-swapping');
+}
+
 function updateTrackUI(track) {
   $('#nowTitle').textContent = track.title;
   $('#nowDesc').textContent = track.desc;
@@ -376,6 +434,7 @@ function updateTrackUI(track) {
   $('#miniCover').src = track.cover;
   $('#miniTitle').textContent = track.title;
   $('#trackCounter').textContent = `${String(track.n).padStart(2, '0')} / 08`;
+  swapPlayerHeading();
   const following = tracks[(current + 1) % tracks.length];
   const nextLabel = $('#nextTitle');
   if (nextLabel) nextLabel.textContent = following.title;
