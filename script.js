@@ -18,6 +18,7 @@ const audio = $('#audio');
 const seek = $('#seek');
 const volume = $('#volume');
 const lyricsBox = $('#lyrics');
+const lyricsShell = $('#lyricsShell');
 const list = $('#trackList');
 const { clamp, cueIndex, seekTime, formatTime } = window.LyricSync;
 const store = {
@@ -141,6 +142,7 @@ function renderChars() {
     <article class="char">
       <a class="char-image" href="${escapeHTML(character.video)}" target="_blank" rel="noopener noreferrer" aria-label="Открыть видео: ${escapeHTML(character.name)}">
         <img src="${escapeHTML(character.image)}" alt="${escapeHTML(character.alt)}" width="1280" height="720" loading="lazy">
+        <span class="char-watch" aria-hidden="true">▸ Смотреть кадр</span>
         <span class="char-image-number" aria-hidden="true">✦</span>
       </a>
       <div class="char-content"><span>${escapeHTML(character.role)}</span><h3>${escapeHTML(character.name)}</h3><p>${escapeHTML(character.text)}</p>
@@ -157,6 +159,8 @@ function renderStory(track) {
 }
 
 function renderLyrics(track) {
+  const lyricsTitle = $('#lyricsTrack');
+  if (lyricsTitle) lyricsTitle.textContent = track.title;
   lyrics = (window.LYRICS_DATA && window.LYRICS_DATA[track.key]) || [];
   activeIndex = -1;
   setFollow(true);
@@ -332,6 +336,7 @@ function updateTime(forceLyrics = false) {
   $('#duration').textContent = formatTime(duration);
   $('#miniTime').textContent = formatTime(position);
   $('#miniProgress').style.width = `${duration ? position / duration * 100 : 0}%`;
+  if (lyricsShell) lyricsShell.style.setProperty('--lyrics-progress', `${duration ? Math.min(100, position / duration * 100) : 0}%`);
   recordHeard();
   updateLyrics(forceLyrics);
   const second = Math.floor(position);
@@ -366,6 +371,8 @@ function updateTrackUI(track) {
   $('#nowDesc').textContent = track.desc;
   $('#nowCover').src = track.cover;
   $('#nowCover').alt = `Иллюстрация к треку «${track.title}»`;
+  const playerCard = document.querySelector('.player-card');
+  if (playerCard) playerCard.style.setProperty('--cover-art', `url('${track.cover}')`);
   $('#miniCover').src = track.cover;
   $('#miniTitle').textContent = track.title;
   $('#trackCounter').textContent = `${String(track.n).padStart(2, '0')} / 08`;
@@ -675,6 +682,7 @@ $('#play').addEventListener('click', togglePlayback);
 $('#miniPlay').addEventListener('click', togglePlayback);
 $('#prev').addEventListener('click', previous);
 $('#next').addEventListener('click', () => next(true));
+$('#nextUp').addEventListener('click', () => next(true));
 $('#miniNext').addEventListener('click', () => next(true));
 $('#sourceAudio').addEventListener('click', () => setProvider('audio'));
 $('#sourceVideo').addEventListener('click', () => setProvider('youtube'));

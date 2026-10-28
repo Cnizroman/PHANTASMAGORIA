@@ -24,7 +24,7 @@
 <link rel="preload" as="font" type="font/woff2" href="assets/fonts/playfair-display-cyrillic-wght-normal.woff2" crossorigin>
 <link rel="stylesheet" href="fonts.css">
 <link rel="preload" as="image" href="assets/cover.jpg" fetchpriority="high">
-<link rel="preload" as="image" href="assets/scene-karusel.jpg">
+<link rel="preload" as="image" href="assets/hero-karusel.jpg">
 <link rel="stylesheet" href="style.css">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"MusicAlbum","name":"PHANTASMAGORIA","byArtist":{"@type":"MusicGroup","name":"MZLFF"},"datePublished":"2025-09-26","numTracks":8,"albumProductionType":"StudioAlbum","genre":["хип-хоп","концептуальный альбом"],"description":"Концептуальный альбом MZLFF о парке развлечений, памяти и расплате."}
@@ -159,7 +159,7 @@
       <div class="story-collage" aria-hidden="true">
         <figure class="collage-photo collage-a"><img src="assets/art-nyuta.jpg" alt="" width="640" height="640" loading="lazy" decoding="async"><figcaption>НЮТА · КАДР ИЗ ВИДЕО</figcaption></figure>
         <figure class="collage-photo collage-b"><img src="assets/art-bear.jpg" alt="" width="640" height="623" loading="lazy" decoding="async"><figcaption>МИШКА · PARK OF ATTRACTIONS</figcaption></figure>
-        <figure class="collage-photo collage-c"><img src="assets/art-ghost-l.jpg" alt="" width="400" height="640" loading="lazy" decoding="async"><figcaption>ЗА СТЕКЛОМ</figcaption></figure>
+        <figure class="collage-photo collage-c"><img src="assets/scene-autodrom.jpg" alt="" width="1280" height="720" loading="lazy" decoding="async"><figcaption>АВТОДРОМ · КАДР ИЗ ВИДЕО</figcaption></figure>
       </div>
 
       <div class="story-grid">
@@ -219,7 +219,7 @@
     <div class="player-layout">
       <div class="player-column">
         <div class="player-card">
-          <div class="player-topline"><span>ПЛЕЕР · MZLFF / PHANTASMAGORIA</span><span id="trackCounter">01 / 08</span></div>
+          <div class="player-topline"><span>ПЛЕЕР</span><span id="trackCounter">01 / 08</span></div>
           <div class="player-heading">
             <div class="mini-cover">
               <div class="disc" aria-hidden="true"></div>
@@ -251,22 +251,30 @@
           </div>
           <div class="player-error" id="playerError" hidden><p id="errorText"></p><div><button type="button" id="retry">Попробовать снова</button><button type="button" id="errorVideo">Включить видео</button><a id="errorLink" href="https://www.youtube.com/watch?v=HIl0jzLga58" target="_blank" rel="noopener noreferrer">Открыть YouTube ↗</a></div></div>
           <div class="player-links">
-            <span class="up-next">ДАЛЕЕ · <b id="nextTitle">медленный танец</b></span>
+            <button type="button" class="up-next" id="nextUp" title="Включить следующий трек"><span>ДАЛЕЕ</span> <b id="nextTitle">медленный танец</b> <i aria-hidden="true">▸</i></button>
             <a id="videoLink" href="https://www.youtube.com/watch?v=HIl0jzLga58" target="_blank" rel="noopener noreferrer">ОФИЦИАЛЬНОЕ ВИДЕО ↗</a>
             <button type="button" id="shareTrack">СКОПИРОВАТЬ ССЫЛКУ ↗</button>
           </div>
           <details class="story-details"><summary><span>СЮЖЕТ ЭТОЙ ГЛАВЫ</span><span aria-hidden="true">+</span></summary><div class="story-box" id="storyBox"></div></details>
-          <p class="keys-hint"><kbd>ПРОБЕЛ</kbd> пауза <span aria-hidden="true">·</span> <kbd>СТРЕЛКИ</kbd> треки <span aria-hidden="true">·</span> <kbd>M</kbd> звук</p>
           <audio id="audio" preload="none"></audio>
         </div>
       </div>
       <div class="lyrics-card" id="lyricsShell">
-        <div class="lyrics-header"><div><span>ТЕКСТ / СИНХРОНИЗАЦИЯ</span><p>Нажми на строку, чтобы перемотать</p></div><span class="lyrics-live"><i></i> LIVE</span></div>
-        <div class="lyrics-tools"><span>СДВИГ ТЕКСТА</span><div class="nudge" role="group" aria-label="Подстройка текста"><button id="offMinus" type="button" aria-label="−0.5: показывать текст на полсекунды раньше" title="Показывать раньше">−0.5</button><button id="offReset" type="button" aria-label="0.0 с: сбросить сдвиг текста" title="Сбросить сдвиг">0.0 с</button><button id="offPlus" type="button" aria-label="+0.5: показывать текст на полсекунды позже" title="Показывать позже">+0.5</button><button id="lyricsHelp" type="button" aria-label="О синхронизации">?</button></div></div>
-        <div id="lyrics" class="lyrics" tabindex="0" aria-label="Текст текущего трека"><p class="lyrics-empty" role="status">Загрузка текста…</p></div>
-        <div class="lyrics-footer"><span>ТАЙМКОДЫ ДЛЯ АЛЬБОМНОЙ ВЕРСИИ</span><button type="button" id="followLyrics" hidden>↓ К ТЕКУЩЕЙ СТРОКЕ</button></div>
+        <div class="lyrics-header">
+          <div class="lyrics-heading"><span>ТЕКСТ</span><b id="lyricsTrack">мало-помалу</b></div>
+          <span class="lyrics-live"><i></i> LIVE</span>
+        </div>
+        <div class="lyrics-body">
+          <div id="lyrics" class="lyrics" tabindex="0" aria-label="Текст текущего трека"><p class="lyrics-empty" role="status">Загрузка текста…</p></div>
+          <button type="button" id="followLyrics" hidden>↓ К ТЕКУЩЕЙ СТРОКЕ</button>
+        </div>
+        <div class="lyrics-footer">
+          <p class="lyrics-hint">Нажми на строку — перемотать</p>
+          <div class="nudge" role="group" aria-label="Подстройка текста"><span aria-hidden="true">СДВИГ</span><button id="offMinus" type="button" aria-label="−0.5: показывать текст на полсекунды раньше" title="Показывать раньше">−0.5</button><button id="offReset" type="button" aria-label="0.0 с: сбросить сдвиг текста" title="Сбросить сдвиг">0.0 с</button><button id="offPlus" type="button" aria-label="+0.5: показывать текст на полсекунды позже" title="Показывать позже">+0.5</button><button id="lyricsHelp" type="button" aria-label="О синхронизации">?</button></div>
+        </div>
       </div>
     </div>
+    <p class="listen-keys"><kbd>ПРОБЕЛ</kbd> пауза <span aria-hidden="true">·</span> <kbd>СТРЕЛКИ</kbd> треки <span aria-hidden="true">·</span> <kbd>M</kbd> звук <span aria-hidden="true">·</span> таймкоды — для альбомной версии</p>
   </section>
 
   <section class="artist section-frame reveal" id="artist" data-num="06">
