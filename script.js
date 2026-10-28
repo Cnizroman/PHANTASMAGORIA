@@ -108,6 +108,20 @@ function recordHeard() {
   paintHeard();
 }
 
+// The hero doubles as the map of the album: eight stops in release order.
+function renderHeroRoute() {
+  const route = $('#heroRoute');
+  if (!route) return;
+  route.innerHTML = '<span class="route-label">МАРШРУТ</span>' + tracks.map((track, index) => `
+    <button class="route-stop" type="button" data-i="${index}" title="Слушать: ${escapeHTML(track.title)}">
+      <i>${String(track.n).padStart(2, '0')}</i><span>${escapeHTML(track.title)}</span>
+    </button>`).join('');
+  route.querySelectorAll('.route-stop').forEach(button => button.addEventListener('click', () => {
+    loadTrack(Number(button.dataset.i), true);
+    $('#listen').scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
+  }));
+}
+
 function renderPlot() {
   if (!window.STORY) return;
   $('#plot').innerHTML = '<div class="plot-title">СЮЖЕТ ПО ТРЕКАМ</div>' + tracks.map((track, index) => {
@@ -365,6 +379,10 @@ function updateTrackUI(track) {
     element.classList.toggle('selected', index === current);
     if (index === current) element.setAttribute('aria-current', 'true');
     else element.removeAttribute('aria-current');
+  });
+  $$('.route-stop').forEach((element, index) => {
+    element.setAttribute('aria-current', String(index === current));
+    element.classList.toggle('is-current', index === current);
   });
   setMediaMetadata(track);
 }
@@ -857,6 +875,7 @@ if ('IntersectionObserver' in window) {
 }
 
 renderTracks();
+renderHeroRoute();
 renderPlot();
 renderChars();
 const params = new URLSearchParams(location.search);

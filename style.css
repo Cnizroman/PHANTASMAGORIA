@@ -284,7 +284,8 @@ main { padding-top: var(--bar); }
 .opening {
   position: relative;
   min-height: calc(100svh - var(--bar));
-  min-height: max(660px, calc(100svh - var(--bar)));
+  /* Cap the hero on very tall displays so the composition never floats in a void. */
+  min-height: max(660px, min(calc(100svh - var(--bar)), 1060px));
   display: flex; flex-direction: column;
   padding: clamp(24px, 3.4vw, 44px) var(--pad-x) clamp(18px, 2.4vw, 30px);
   overflow: hidden;
@@ -355,7 +356,7 @@ main { padding-top: var(--bar); }
   position: relative; z-index: 2;
   display: flex; flex-direction: column; justify-content: space-between;
   flex: 1; gap: clamp(26px, 4vh, 52px);
-  max-width: 1480px; width: 100%; margin: 0 auto;
+  max-width: min(1720px, 100%); width: 100%; margin: 0 auto;
 }
 
 .eyebrow {
@@ -480,7 +481,7 @@ main { padding-top: var(--bar); }
 
 .hero-title {
   display: flex; flex-direction: column;
-  font: 500 clamp(52px, 8.5vw, 136px)/.83 var(--serif);
+  font: 500 clamp(52px, 8.5vw, 156px)/.83 var(--serif);
   letter-spacing: -.055em;
   margin: 0 0 clamp(20px, 2.6vw, 30px);
   max-width: 15ch;
@@ -645,6 +646,46 @@ main { padding-top: var(--bar); }
 /* Only the plain numeral watermark is dropped on narrow screens. */
 @media (max-width: 720px) {
   .section-frame::before { font-size: clamp(96px, 26vw, 180px); opacity: .7; }
+}
+
+/* Album route: an always-visible table of contents inside the hero */
+.hero-route {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 6px;
+  margin-top: clamp(10px, 1.4vh, 18px);
+  padding-top: clamp(10px, 1.4vh, 16px);
+  border-top: 1px solid var(--line-2);
+}
+.route-label {
+  margin-right: 8px;
+  font: 500 8.5px var(--mono); letter-spacing: .2em; text-transform: uppercase;
+  color: var(--faint);
+}
+.route-stop {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 11px 6px 8px;
+  border: 1px solid var(--line-2); border-radius: 2px;
+  background: rgba(6, 13, 22, .45);
+  color: var(--muted);
+  font: 500 10.5px/1.2 var(--sans);
+  letter-spacing: .01em;
+  cursor: pointer;
+  transition: color .22s, border-color .22s, background .22s, transform .22s var(--ease);
+}
+.route-stop i {
+  font: 500 8.5px var(--mono); font-style: normal; letter-spacing: .06em;
+  color: var(--cyan);
+}
+.route-stop:hover, .route-stop:focus-visible {
+  color: var(--cream);
+  border-color: rgba(140, 230, 248, .5);
+  background: rgba(140, 230, 248, .08);
+  transform: translateY(-2px);
+}
+.route-stop.is-current {
+  border-color: rgba(245, 231, 189, .5);
+  color: var(--cream);
+  background: rgba(245, 231, 189, .09);
 }
 
 /* 6. Marquee ============================================================== */
@@ -889,7 +930,13 @@ main { padding-top: var(--bar); }
   color: var(--cream);
   text-wrap: balance;
 }
-.story-quote span { color: var(--violet); font-size: 1.2em; line-height: 0; }
+.story-quote span {
+  color: var(--violet);
+  font-size: .78em;
+  line-height: 1;
+  vertical-align: super;
+  letter-spacing: 0;
+}
 .story-quote::before,
 .story-quote::after {
   content: ''; display: block; width: 1px; height: clamp(24px, 3vw, 40px);
@@ -2024,8 +2071,9 @@ audio { display: none; }
 
   .hero-aside {
     position: static; width: auto; flex-direction: row; align-items: flex-end;
-    justify-content: flex-start; gap: 22px;
+    justify-content: flex-start; gap: 22px; margin-top: 4px;
   }
+  .hero-route { display: none; }
   .hero-ticket { width: 178px; padding: 13px 14px; transform: rotate(-1.6deg); }
   .hero-ticket b { font-size: 27px; margin: 9px 0 8px; }
   .ticket-barcode { height: 18px; }
@@ -2056,6 +2104,10 @@ audio { display: none; }
   .hero-title { font-size: clamp(44px, 12.4vw, 78px); }
   .hero-text { max-width: 46ch; }
   .hero-foot { flex-wrap: wrap; gap: 10px; }
+  .hero-route { flex-wrap: nowrap; overflow-x: auto; gap: 5px; padding-bottom: 4px; scrollbar-width: none; }
+  .hero-route::-webkit-scrollbar { display: none; }
+  .route-stop { flex: none; padding: 5px 9px 5px 7px; font-size: 10px; }
+  .route-label { flex: none; }
   .marquee-track span { font-size: 9px; letter-spacing: .18em; }
 
   .chapter { grid-template-columns: 1fr; gap: 14px; }
