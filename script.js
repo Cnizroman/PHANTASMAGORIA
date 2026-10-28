@@ -18,12 +18,17 @@ const audio = $('#audio');
 const seek = $('#seek');
 const volume = $('#volume');
 const lyricsBox = $('#lyrics');
+const lyricsShell = $('#lyricsShell');
 const list = $('#trackList');
 const { clamp, cueIndex, seekTime, formatTime } = window.LyricSync;
 const store = {
   get(key, fallback) { try { return localStorage.getItem(key) ?? fallback; } catch (_) { return fallback; } },
   set(key, value) { try { localStorage.setItem(key, String(value)); } catch (_) { /* private mode */ } }
 };
+const HEARD_KEY = 'ph:heard:v1';
+let heard = {};
+try { heard = JSON.parse(store.get(HEARD_KEY, '{}')) || {}; } catch (_) { heard = {}; }
+if (!heard || typeof heard !== 'object') heard = {};
 const escapeHTML = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const reducedMotion = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 const scrollBehavior = () => reducedMotion() ? 'auto' : 'smooth';
@@ -38,6 +43,8 @@ let lineEls = [];
 let activeIndex = -1;
 let delay = 0;
 let follow = true;
+let lyricsScrollFrame = 0;
+let lyricsEnterTimer = 0;
 let draggingSeek = false;
 let desiredPlaying = false;
 let hasStarted = false;
@@ -64,10 +71,55 @@ function renderTracks() {
   list.innerHTML = tracks.map((track, index) => `
     <button class="track" type="button" data-i="${index}">
       <span class="track-no">${String(track.n).padStart(2, '0')}</span>
-      <span class="track-copy"><span class="track-name">${escapeHTML(track.title)}</span><span class="track-desc">${escapeHTML(track.desc)}</span></span>
-      <span class="track-time">${formatTime(track.seconds)}</span><span class="track-go">СЛУШАТЬ <span aria-hidden="true">↗</span></span>
+      <span class="track-copy"><span class="track-name">${escapeHTML(track.title)}</span><span class="track-progress" aria-hidden="true"><i></i></span><span class="track-desc">${escapeHTML(track.desc)}</span></span>
+      <span class="track-time">${formatTime(track.seconds)}</span><span class="track-go"><span class="go-label">СЛУШАТЬ </span><span aria-hidden="true">↗</span></span>
     </button>`).join('');
   $$('.track').forEach(button => button.addEventListener('click', () => {
+    loadTrack(Number(button.dataset.i), true);
+    $('#listen').scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
+  }));
+  paintHeard();
+}
+
+// How far the visitor has travelled through each stop is remembered locally,
+// so the tracklist can double as a map of the album.
+function paintHeard() {
+  let done = 0;
+  $$('.track').forEach((element, index) => {
+    const value = Math.max(0, Math.min(1, Number(heard[tracks[index].key]) || 0));
+    if (value >= 0.9) done++;
+    const bar = element.querySelector('.track-progress i');
+    if (bar) bar.style.width = `${Math.round(value * 100)}%`;
+    element.classList.toggle('heard', value >= 0.9);
+    element.classList.toggle('heard-part', value > 0 && value < 0.9);
+  });
+  const counter = $('#heardCount');
+  if (counter) counter.textContent = `${String(done).padStart(2, '0')} / 08`;
+}
+
+function recordHeard() {
+  const duration = getDuration();
+  const position = getPosition();
+  if (!Number.isFinite(duration) || duration <= 0 || !Number.isFinite(position)) return;
+  const fraction = clamp(position / duration, 0, 1);
+  const key = tracks[current].key;
+  const previous = Number(heard[key]) || 0;
+  const next = Math.round(fraction * 100) / 100;
+  if (next <= previous) return;
+  heard[key] = next;
+  store.set(HEARD_KEY, JSON.stringify(heard));
+  paintHeard();
+}
+
+// The hero doubles as the map of the album: eight stops in release order.
+function renderHeroRoute() {
+  const route = $('#heroRoute');
+  if (!route) return;
+  route.innerHTML = '<span class="route-label">МАРШРУТ</span>' + tracks.map((track, index) => `
+    <button class="route-stop" type="button" data-i="${index}" title="Слушать: ${escapeHTML(track.title)}">
+      <i>${String(track.n).padStart(2, '0')}</i><span>${escapeHTML(track.title)}</span>
+    </button>`).join('');
+  route.querySelectorAll('.route-stop').forEach(button => button.addEventListener('click', () => {
     loadTrack(Number(button.dataset.i), true);
     $('#listen').scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
   }));
@@ -92,6 +144,7 @@ function renderChars() {
     <article class="char">
       <a class="char-image" href="${escapeHTML(character.video)}" target="_blank" rel="noopener noreferrer" aria-label="Открыть видео: ${escapeHTML(character.name)}">
         <img src="${escapeHTML(character.image)}" alt="${escapeHTML(character.alt)}" width="1280" height="720" loading="lazy">
+        <span class="char-watch" aria-hidden="true">▸ Смотреть кадр</span>
         <span class="char-image-number" aria-hidden="true">✦</span>
       </a>
       <div class="char-content"><span>${escapeHTML(character.role)}</span><h3>${escapeHTML(character.name)}</h3><p>${escapeHTML(character.text)}</p>
@@ -108,6 +161,8 @@ function renderStory(track) {
 }
 
 function renderLyrics(track) {
+  const lyricsTitle = $('#lyricsTrack');
+  if (lyricsTitle) lyricsTitle.textContent = track.title;
   lyrics = (window.LYRICS_DATA && window.LYRICS_DATA[track.key]) || [];
   activeIndex = -1;
   setFollow(true);
@@ -117,8 +172,9 @@ function renderLyrics(track) {
     return;
   }
   lyricsBox.innerHTML = lyrics.map((cue, index) => cue.text
-    ? `<button class="lyric-line" type="button" data-index="${index}" title="Перейти к ${formatTime(cue.time)}"><span class="lyric-time" aria-hidden="true">${formatTime(cue.time)}</span><span>${escapeHTML(cue.text)}</span></button>`
-    : `<span class="lyric-break" data-index="${index}" aria-label="Инструментальный фрагмент">✦</span>`).join('');
+    ? `<button class="lyric-line" type="button" data-index="${index}" style="--i:${Math.min(index, 8)}" title="Перейти к ${formatTime(cue.time)}"><span class="lyric-time" aria-hidden="true">${formatTime(cue.time)}</span><span>${escapeHTML(cue.text)}</span></button>`
+    : `<span class="lyric-break" data-index="${index}" style="--i:${Math.min(index, 8)}" aria-label="Инструментальный фрагмент">✦</span>`).join('');
+  playLyricsEntrance();
   lineEls = [...lyricsBox.querySelectorAll('[data-index]')];
   lyricsBox.querySelectorAll('button.lyric-line').forEach(button => button.addEventListener('click', () => {
     const cue = lyrics[Number(button.dataset.index)];
@@ -130,9 +186,52 @@ function renderLyrics(track) {
   updateLyrics(true);
 }
 
+function cancelLyricsScroll() {
+  if (lyricsScrollFrame) { cancelAnimationFrame(lyricsScrollFrame); lyricsScrollFrame = 0; }
+}
+
+// Eased, retargetable scroll so every new line glides in instead of jumping.
+function scrollLyricsTo(target) {
+  const max = Math.max(0, lyricsBox.scrollHeight - lyricsBox.clientHeight);
+  const destination = clamp(target, 0, max);
+  if (reducedMotion()) {
+    cancelLyricsScroll();
+    lyricsBox.scrollTop = destination;
+    return;
+  }
+  const from = lyricsBox.scrollTop;
+  const distance = destination - from;
+  if (Math.abs(distance) < .5) return;
+  const duration = clamp(300 + Math.abs(distance) * .7, 300, 820);
+  const started = performance.now();
+  cancelLyricsScroll();
+  const step = now => {
+    const progress = Math.min(1, (now - started) / duration);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    lyricsBox.scrollTop = from + distance * eased;
+    lyricsScrollFrame = progress < 1 ? requestAnimationFrame(step) : 0;
+  };
+  lyricsScrollFrame = requestAnimationFrame(step);
+}
+
+function playLyricsEntrance() {
+  lyricsBox.classList.remove('is-entering');
+  const heading = document.querySelector('.lyrics-heading');
+  if (heading) heading.classList.remove('is-entering');
+  void lyricsBox.offsetWidth;
+  lyricsBox.classList.add('is-entering');
+  if (heading) heading.classList.add('is-entering');
+  clearTimeout(lyricsEnterTimer);
+  lyricsEnterTimer = setTimeout(() => {
+    lyricsBox.classList.remove('is-entering');
+    if (heading) heading.classList.remove('is-entering');
+  }, 1300);
+}
+
 function setFollow(enabled) {
   follow = enabled;
   $('#followLyrics').hidden = enabled;
+  if (!enabled) cancelLyricsScroll();
 }
 
 function updateLyrics(force = false) {
@@ -144,6 +243,8 @@ function updateLyrics(force = false) {
     element.classList.toggle('active', i === index);
     element.classList.toggle('past', i < index);
     element.classList.toggle('future', i > index);
+    // distance drives the reading spotlight: neighbours glow, the far lines recede
+    element.style.setProperty('--d', index < 0 ? 0 : Math.min(Math.abs(i - index), 9));
     if (element.tagName === 'BUTTON') {
       if (i === index) element.setAttribute('aria-current', 'true');
       else element.removeAttribute('aria-current');
@@ -153,7 +254,7 @@ function updateLyrics(force = false) {
   if (active && follow && !draggingSeek) {
     // Use relative bounding boxes: offsetTop may be relative to a sticky ancestor.
     const delta = active.getBoundingClientRect().top - lyricsBox.getBoundingClientRect().top - (lyricsBox.clientHeight - active.clientHeight) / 2;
-    lyricsBox.scrollTo({ top: lyricsBox.scrollTop + delta, behavior: scrollBehavior() });
+    scrollLyricsTo(lyricsBox.scrollTop + delta);
   }
 }
 
@@ -206,6 +307,7 @@ function updatePlayButtons() {
     button.title = label;
   }
   $('#viz').classList.toggle('is-playing', desiredPlaying);
+  for (const card of $$('.player-card, .lyrics-card')) card.classList.toggle('is-playing', desiredPlaying);
   if ('mediaSession' in navigator) {
     try { navigator.mediaSession.playbackState = desiredPlaying ? 'playing' : 'paused'; } catch (_) { /* unsupported */ }
   }
@@ -276,11 +378,16 @@ function updateTime(forceLyrics = false) {
   const duration = getDuration();
   const position = clamp(getPosition(), 0, duration);
   if (!draggingSeek) seek.value = duration ? Math.round(position / duration * 1000) : 0;
+  seek.style.setProperty('--p', `${duration ? (position / duration) * 100 : 0}%`);
   seek.setAttribute('aria-valuetext', `${formatTime(position)} из ${formatTime(duration)}`);
   $('#currentTime').textContent = formatTime(position);
   $('#duration').textContent = formatTime(duration);
   $('#miniTime').textContent = formatTime(position);
   $('#miniProgress').style.width = `${duration ? position / duration * 100 : 0}%`;
+  if (lyricsShell) lyricsShell.style.setProperty('--lyrics-progress', `${duration ? Math.min(100, position / duration * 100) : 0}%`);
+  const viz = $('#viz');
+  if (viz) viz.style.setProperty('--viz-progress', `${duration ? Math.min(100, position / duration * 100) : 0}%`);
+  recordHeard();
   updateLyrics(forceLyrics);
   const second = Math.floor(position);
   if (second !== lastMediaSecond && 'mediaSession' in navigator && navigator.mediaSession.setPositionState) {
@@ -309,14 +416,28 @@ function setMediaMetadata(track) {
   } catch (_) { /* optional platform integration */ }
 }
 
+function swapPlayerHeading() {
+  const heading = $('.player-heading');
+  if (!heading || reducedMotion()) return;
+  heading.classList.remove('is-swapping');
+  void heading.offsetWidth;
+  heading.classList.add('is-swapping');
+}
+
 function updateTrackUI(track) {
   $('#nowTitle').textContent = track.title;
   $('#nowDesc').textContent = track.desc;
   $('#nowCover').src = track.cover;
   $('#nowCover').alt = `Иллюстрация к треку «${track.title}»`;
+  const playerCard = document.querySelector('.player-card');
+  if (playerCard) playerCard.style.setProperty('--cover-art', `url('${track.cover}')`);
   $('#miniCover').src = track.cover;
   $('#miniTitle').textContent = track.title;
   $('#trackCounter').textContent = `${String(track.n).padStart(2, '0')} / 08`;
+  swapPlayerHeading();
+  const following = tracks[(current + 1) % tracks.length];
+  const nextLabel = $('#nextTitle');
+  if (nextLabel) nextLabel.textContent = following.title;
   $('#videoLink').href = videoURL(track);
   $('#errorLink').href = videoURL(track);
   document.title = `${track.title} · MZLFF / PHANTASMAGORIA`;
@@ -324,6 +445,10 @@ function updateTrackUI(track) {
     element.classList.toggle('selected', index === current);
     if (index === current) element.setAttribute('aria-current', 'true');
     else element.removeAttribute('aria-current');
+  });
+  $$('.route-stop').forEach((element, index) => {
+    element.setAttribute('aria-current', String(index === current));
+    element.classList.toggle('is-current', index === current);
   });
   setMediaMetadata(track);
 }
@@ -616,6 +741,7 @@ $('#play').addEventListener('click', togglePlayback);
 $('#miniPlay').addEventListener('click', togglePlayback);
 $('#prev').addEventListener('click', previous);
 $('#next').addEventListener('click', () => next(true));
+$('#nextUp').addEventListener('click', () => next(true));
 $('#miniNext').addEventListener('click', () => next(true));
 $('#sourceAudio').addEventListener('click', () => setProvider('audio'));
 $('#sourceVideo').addEventListener('click', () => setProvider('youtube'));
@@ -647,9 +773,11 @@ $('#repeat').addEventListener('click', event => {
 
 const savedVolume = Number(store.get('ph:vol', 0.8));
 volume.value = String(Math.round(clamp(Number.isFinite(savedVolume) ? savedVolume : 0.8, 0, 1) * 100));
+volume.style.setProperty('--p', `${volume.value}%`);
 audio.volume = Number(volume.value) / 100;
 volume.addEventListener('input', () => {
   const value = Number(volume.value);
+  volume.style.setProperty('--p', `${value}%`);
   audio.volume = value / 100;
   store.set('ph:vol', value / 100);
   if (youtubeReady && youtubePlayer) {
@@ -748,8 +876,28 @@ if ('mediaSession' in navigator) {
 }
 
 addEventListener('keydown', event => {
-  if (!hasStarted || event.altKey || event.ctrlKey || event.metaKey || event.target.closest('input, textarea, select, button, a, [contenteditable]')) return;
-  if (event.code === 'Space') { event.preventDefault(); togglePlayback(); }
+  if (event.altKey || event.ctrlKey || event.metaKey) return;
+  if (event.target.closest('input, textarea, select, button, a, [contenteditable], .lyrics')) return;
+  if (event.code === 'Space') {
+    if (!hasStarted) return;
+    event.preventDefault();
+    togglePlayback();
+    return;
+  }
+  if (event.key === 'ArrowRight') { event.preventDefault(); next(true); return; }
+  if (event.key === 'ArrowLeft') { event.preventDefault(); previous(); return; }
+  if (event.key === 'm' || event.key === 'M' || event.key === 'ь' || event.key === 'Ь') {
+    const muted = Number(volume.value) === 0;
+    if (muted) {
+      const restored = Number(store.get('ph:vol:last', 0.8));
+      volume.value = String(Math.round(clamp(Number.isFinite(restored) ? restored : 0.8, 0.05, 1) * 100));
+    } else {
+      store.set('ph:vol:last', (Number(volume.value) || 80) / 100);
+      volume.value = '0';
+    }
+    volume.dispatchEvent(new Event('input', { bubbles: true }));
+    showToast(muted ? 'Звук включён' : 'Звук выключен');
+  }
 });
 
 /* Navigation, section visibility, and the mini-player. */
@@ -794,6 +942,7 @@ if ('IntersectionObserver' in window) {
 }
 
 renderTracks();
+renderHeroRoute();
 renderPlot();
 renderChars();
 const params = new URLSearchParams(location.search);

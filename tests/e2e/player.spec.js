@@ -125,6 +125,23 @@ test('rapid track changes preserve playback state, mini-player works, and the la
   await expect(page.locator('#playerStatus')).toHaveAttribute('data-state', 'playing');
 });
 
+test('listening progress marks heard stops and persists between visits', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#heardCount')).toHaveText('00 / 08');
+  await expect(page.locator('.track[data-i="0"]')).not.toHaveClass(/heard/);
+  await startAudio(page);
+  // Walking a track to its end is what counts as "heard".
+  await page.locator('#audio').evaluate(element => { element.currentTime = element.duration - .3; });
+  await expect(page.locator('#nowTitle')).toHaveText('медленный танец', { timeout: 7000 });
+  await expect(page.locator('.track[data-i="0"]')).toHaveClass(/heard/);
+  await expect(page.locator('#heardCount')).toHaveText('01 / 08');
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('ph:heard:v1') || '{}'));
+  expect(stored['01-malo-pomalu']).toBeGreaterThanOrEqual(0.9);
+  await page.reload();
+  await expect(page.locator('.track[data-i="0"]')).toHaveClass(/heard/);
+  await expect(page.locator('#heardCount')).toHaveText('01 / 08');
+});
+
 test('audio failure exposes retry, video fallback and official link', async ({ page }) => {
   await page.route('**/releases/download/audio-v1/**', route => route.abort());
   await page.goto('/');
