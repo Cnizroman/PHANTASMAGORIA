@@ -298,7 +298,12 @@ main { padding-top: var(--bar); }
 .art-photo {
   position: absolute; top: 0; right: 0; bottom: 0;
   width: min(66%, 900px);
-  background: url('assets/hero-karusel.jpg') 50% 46% / cover no-repeat;
+  background-color: #060c14;
+  background-image: url('assets/hero-karusel.jpg');
+  background-image: image-set(url('assets/hero-karusel.webp') type('image/webp'), url('assets/hero-karusel.jpg') type('image/jpeg'));
+  background-position: 50% 46%;
+  background-size: cover;
+  background-repeat: no-repeat;
   filter: saturate(1.04) contrast(1.03) brightness(.9);
   transform: translate3d(var(--hero-px, 0px), var(--hero-py, 0px), 0) scale(1.06);
   transition: transform .5s linear;
@@ -1176,6 +1181,8 @@ main { padding-top: var(--bar); }
   text-align: right;
   white-space: nowrap;
 }
+.track-time { display: grid; justify-items: end; gap: 0; }
+.track-time .track-progress { justify-self: end; }
 .track-go { color: var(--cyan); }
 .track-go span { display: inline-block; transition: transform .3s var(--ease); }
 .track:hover .track-go span { transform: translate(3px, -3px); }
@@ -2373,7 +2380,9 @@ audio { display: none; }
 }
 
 @media (max-width: 560px) {
-  .album-rail { grid-template-columns: 88px minmax(0, 1fr); }
+  .album-rail { grid-template-columns: 116px minmax(0, 1fr); gap: 6px 18px; }
+  .album-rail h1 { font-size: clamp(21px, 5.6vw, 26px); }
+  .artist-name { font-size: 9px; }
   .cover-frame { padding: 4px; }
   .rail-meta { grid-column: 1 / -1; grid-row: auto; margin-top: 12px; }
 }
@@ -2382,8 +2391,8 @@ audio { display: none; }
   :root { --pad-x: 18px; --bar: 62px; }
   .brand i { display: none; }
   .opening { padding-top: 20px; }
-  .album-rail { grid-template-columns: 88px minmax(0, 1fr); gap: 4px 14px; }
-  .album-rail h1 { font-size: 18px; }
+  .album-rail { grid-template-columns: 104px minmax(0, 1fr); gap: 4px 16px; }
+  .album-rail h1 { font-size: clamp(20px, 5.4vw, 24px); }
   .rail-meta { font-size: 7.5px; gap: 4px; letter-spacing: .06em; }
   .rail-meta b { font-size: 11px; }
   .rail-copy { font-size: 11.5px; line-height: 1.6; }
@@ -2424,7 +2433,7 @@ audio { display: none; }
 }
 
 @media (max-width: 360px) {
-  .album-rail { grid-template-columns: 78px minmax(0, 1fr); }
+  .album-rail { grid-template-columns: 92px minmax(0, 1fr); }
   .hero-ticket { width: 146px; }
   .plot { grid-template-columns: 1fr; }
   .track { grid-template-columns: 30px minmax(0, 1fr) 18px; gap: 8px; }
@@ -2447,10 +2456,10 @@ audio { display: none; }
 /* Listening map: how far the visitor has travelled through each stop. */
 .track-progress {
   display: block;
-  max-width: 190px;
+  width: 74px;
   height: 2px;
-  margin-top: 9px;
-  background: rgba(150, 205, 235, .12);
+  margin-top: 7px;
+  background: rgba(150, 205, 235, .14);
   overflow: hidden;
   border-radius: 1px;
 }
@@ -2527,4 +2536,374 @@ audio { display: none; }
   .hero-support { width: 100%; gap: 11px; padding: 12px; }
   .hero-support-copy b { font-size: 16px; }
   .hero-support-copy em { font-size: 9.5px; }
+}
+
+/* 14. Player polish, reading mode and the tour route ====================== */
+
+/* — the current chapter of the album, next to the "now playing" label — */
+.now-meta {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px;
+}
+.now-act {
+  padding-left: 12px;
+  border-left: 1px solid var(--line-3);
+  font: 500 8.5px/1.4 var(--mono);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--cream);
+  opacity: .82;
+}
+
+/* — volume, mute and playback speed — */
+.player-tools {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px;
+  min-width: 0;
+}
+.mute {
+  display: grid; place-items: center;
+  width: 28px; height: 28px; padding: 0;
+  border: 1px solid transparent; border-radius: 50%;
+  background: transparent; color: var(--muted);
+  cursor: pointer;
+  transition: color .2s, border-color .2s, background .2s;
+}
+.mute svg { width: 17px; height: 17px; }
+.mute:hover { color: var(--cyan); border-color: rgba(140, 230, 248, .4); background: rgba(140, 230, 248, .07); }
+.mute[aria-pressed=true] { color: var(--cream); border-color: rgba(245, 231, 189, .38); }
+.speed {
+  display: flex; align-items: center; gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line-2);
+  background: rgba(4, 10, 18, .55);
+}
+.speed-label {
+  padding: 0 6px 0 4px;
+  font: 500 7px var(--mono);
+  letter-spacing: .14em;
+  color: var(--faint);
+}
+.speed button {
+  min-width: 30px; min-height: 22px; padding: 1px 5px;
+  border: 1px solid transparent; border-radius: 1px;
+  background: transparent; color: var(--dim);
+  font: 500 8.5px/1 var(--mono); letter-spacing: .02em;
+  cursor: pointer;
+  transition: color .2s, background .2s, border-color .2s;
+}
+.speed button:hover { color: var(--ink); background: rgba(140, 230, 248, .08); }
+.speed button[aria-pressed=true] {
+  color: #0a1620; background: var(--cream); border-color: var(--cream);
+}
+
+/* — lyrics toolbar and the expandable reading mode — */
+.lyrics-tools { display: flex; align-items: center; gap: 8px; flex: none; }
+.lyrics-expand {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 26px; padding: 3px 8px;
+  border: 1px solid var(--line-2); border-radius: 2px;
+  background: transparent; color: var(--dim);
+  font: 500 7.5px var(--mono); letter-spacing: .12em; text-transform: uppercase;
+  cursor: pointer;
+  transition: color .2s, border-color .2s, background .2s;
+}
+.lyrics-expand svg { width: 12px; height: 12px; }
+.lyrics-expand:hover { color: var(--cyan); border-color: rgba(140, 230, 248, .45); background: rgba(140, 230, 248, .08); }
+.lyrics-expand[aria-pressed=true] { color: var(--cream); border-color: rgba(245, 231, 189, .4); }
+
+.lyrics-dialog {
+  width: min(1240px, calc(100vw - 28px));
+  max-width: none; max-height: none;
+  margin: auto; padding: 0;
+  border: 0; background: transparent; color: inherit;
+  overflow: visible;
+}
+.lyrics-dialog:not([open]) { display: none; }
+.lyrics-dialog::backdrop {
+  background: rgba(3, 6, 11, .86);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.lyrics-dialog .lyrics-card {
+  height: min(900px, calc(100dvh - 28px));
+  border: 1px solid rgba(140, 230, 248, .24);
+  border-left: 1px solid rgba(140, 230, 248, .24);
+  border-radius: 3px;
+  background:
+    radial-gradient(80% 55% at 100% 0%, rgba(171, 156, 242, .12), transparent 62%),
+    linear-gradient(180deg, rgba(11, 23, 36, .99), rgba(4, 9, 16, .995));
+  box-shadow: 0 50px 140px rgba(0, 0, 0, .85), 0 0 0 1px rgba(140, 230, 248, .08);
+  animation: focus-in .4s var(--ease) both;
+}
+.lyrics-dialog .lyrics-card::before { display: none; }
+.lyrics-dialog .lyrics-header { min-height: 62px; }
+.lyrics-dialog .lyrics-body { min-height: 0; flex: 1; }
+.lyrics-dialog .lyrics { scroll-padding-block: 44%; }
+.lyrics-dialog .lyric-line {
+  padding: 12px 10px 12px 20px;
+  font-size: clamp(20px, 2.15vw, 32px);
+}
+.lyrics-dialog .lyric-time { font-size: 10px; }
+.lyrics-dialog .lyrics-footer { padding-block: 12px; }
+body.is-lyrics-focus { overflow: hidden; }
+@keyframes focus-in {
+  from { opacity: 0; transform: translateY(18px) scale(.985); filter: blur(8px); }
+}
+
+/* — the playing stop gets a small equaliser in the tracklist — */
+.track-go .eq { display: none; }
+.track.is-playing .track-go .eq {
+  display: inline-flex; align-items: flex-end; gap: 2px;
+  height: 11px; margin-left: 5px; vertical-align: -1px;
+}
+.track-go .eq i {
+  width: 2px; height: 100%;
+  background: var(--cyan);
+  transform-origin: bottom;
+  transform: scaleY(.4);
+  animation: eq-bounce .8s ease-in-out infinite alternate;
+}
+.track-go .eq i:nth-child(2) { animation-delay: -.34s; background: var(--violet); }
+.track-go .eq i:nth-child(3) { animation-delay: -.62s; background: var(--rose); }
+@keyframes eq-bounce { from { transform: scaleY(.28); } to { transform: scaleY(1); } }
+.track.is-playing .track-go > span:nth-child(2) { display: none; }
+.track.is-playing .track-name { color: var(--cyan); }
+.track.is-playing .track-progress i { box-shadow: 0 0 12px rgba(140, 230, 248, .85); }
+
+/* — tour route taken from the official poster — */
+.tour-schedule {
+  margin-top: clamp(34px, 4.6vw, 64px);
+  padding-top: clamp(22px, 2.8vw, 34px);
+  border-top: 1px solid var(--line);
+}
+.tour-schedule-head {
+  display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px 18px;
+  font: 500 8.5px var(--mono); letter-spacing: .16em; text-transform: uppercase;
+  color: var(--faint);
+}
+.tour-months {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: clamp(18px, 2.6vw, 42px);
+  margin-top: clamp(16px, 2vw, 24px);
+}
+.tour-month h3 {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--line-2);
+  font: 500 clamp(15px, 1.4vw, 18px)/1.2 var(--serif);
+  color: var(--cream);
+}
+.tour-month h3 i {
+  font: 500 8px var(--mono); font-style: normal;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--faint);
+}
+.tour-month ol { list-style: none; margin: 0; padding: 0; }
+.tour-month li {
+  display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 8px; align-items: baseline;
+  padding: 6px 3px;
+  border-bottom: 1px solid rgba(150, 205, 235, .06);
+  font: 500 11.5px/1.4 var(--sans);
+  color: var(--muted);
+  transition: background .2s, color .2s, padding .2s var(--ease);
+}
+.tour-month li b {
+  font: 500 9.5px/1.4 var(--mono); letter-spacing: .04em;
+  color: var(--cyan);
+}
+.tour-month li:hover { background: rgba(140, 230, 248, .05); color: var(--ink); padding-left: 8px; }
+.tour-note {
+  margin-top: 18px; max-width: 72ch;
+  font: 500 8.5px/1.7 var(--mono); letter-spacing: .07em; text-transform: uppercase;
+  color: var(--faint);
+}
+
+/* — a stamp appears on the hero ticket once the whole album is heard — */
+.ticket-stamp {
+  position: absolute; right: 13px; top: 51%;
+  padding: 3px 7px;
+  border: 2px solid #8f2b25; border-radius: 3px;
+  background: rgba(249, 238, 206, .92);
+  color: #8f2b25;
+  font: 700 7px/1.2 var(--mono); letter-spacing: .1em; text-align: center;
+  opacity: 0;
+  transform: rotate(-13deg) scale(.7);
+  transition: opacity .6s, transform .6s var(--ease);
+  pointer-events: none;
+}
+.ticket-stamp b { display: block; font-size: 11px; letter-spacing: .04em; }
+.hero-ticket.is-stamped .ticket-stamp { opacity: 1; transform: rotate(-13deg) scale(1); }
+
+/* — legibility: chapter numerals, descriptions and small mono labels — */
+.section-frame::before { -webkit-text-stroke-color: rgba(140, 230, 248, .075); }
+.chapter-index span { -webkit-text-stroke-color: rgba(140, 230, 248, .68); }
+.track-desc { font-size: 12.5px; color: var(--muted); }
+.chapter-lead, .listen-intro > p { color: #b3c5d5; }
+
+@media (max-width: 940px) {
+  .lyrics-dialog { width: calc(100vw - 16px); }
+  .lyrics-dialog .lyrics-card { height: calc(100dvh - 16px); }
+  .tour-months { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+}
+
+@media (max-width: 720px) {
+  .now-act { padding-left: 9px; font-size: 7.5px; }
+  .lyrics-expand span { display: none; }
+  .lyrics-expand { min-width: 28px; justify-content: center; padding: 3px 6px; }
+  .lyrics-dialog { width: 100vw; }
+  .lyrics-dialog .lyrics-card {
+    height: 100dvh; border: 0; border-radius: 0;
+  }
+  .lyrics-dialog .lyrics-header { min-height: 56px; }
+  .lyrics-dialog .lyrics { padding-inline: 8px 4px; }
+  .lyrics-dialog .lyric-line { font-size: clamp(18px, 4.6vw, 24px); }
+  .tour-month li { font-size: 12.5px; padding-block: 7px; }
+}
+
+@media (max-width: 560px) {
+  .player-tools { width: 100%; }
+  .speed { margin-left: auto; }
+  .speed-label { display: none; }
+  .player-status { width: 100%; justify-content: flex-start; margin-left: 0; }
+}
+
+.speed button { min-width: 36px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .track-go .eq i { animation: none; transform: scaleY(.7); }
+  .lyrics-dialog .lyrics-card { animation: none; }
+  .ticket-stamp { transition: none; }
+}
+
+@media (max-width: 480px) {
+  .rail-copy { display: none; }
+  .rail-meta { border-bottom: 0; }
+}
+
+/* WebP <picture> wrappers keep the same layout as the bare <img> they replace. */
+picture { display: block; }
+.mini-cover picture { height: 100%; }
+.collage-photo picture, .artist-image picture, .tour-poster-large picture { width: 100%; }
+
+/* Controls that need JavaScript stay out of the way when it is unavailable. */
+html:not(.js-enhanced) .lyrics-expand { display: none; }
+
+/* The plot map marks the stop that loaded in the player. */
+.plot-step.is-current {
+  background: linear-gradient(165deg, #123049, #0a1724);
+  box-shadow: inset 0 0 0 1px rgba(140, 230, 248, .22);
+}
+.plot-step.is-current b { color: var(--cream); }
+.plot-step.is-current span { color: var(--cream); }
+
+/* Keep the transport order stable when the tools wrap on phones. */
+@media (max-width: 720px) {
+  .mute { order: 0; }
+  .vol { order: 1; }
+  .speed { order: 2; margin-left: auto; }
+  .speed button { font-size: 9px; min-height: 24px; padding: 2px 6px; }
+  .speed-label { font-size: 7.5px; }
+}
+@media (max-width: 480px) {
+  .vol input { width: 76px; }
+  .speed button { min-width: 32px; }
+}
+
+/* On phones the transport arrow gives way to the duration and the listening
+   meter, which stays visible without looking like an underlined title. */
+@media (max-width: 720px) {
+  .track { grid-template-columns: 30px minmax(0, 1fr) 52px; gap: 10px; }
+  .track-time { display: grid; justify-items: end; gap: 6px; font-size: 8.5px; }
+  .track-time .track-progress { width: 46px; height: 2px; margin: 0; }
+  .track-go { display: none; }
+}
+
+/* Compact transport inside the full-screen reading mode. */
+.focus-transport {
+  display: none; align-items: center; gap: 1px;
+  margin-right: 4px; padding-right: 8px;
+  border-right: 1px solid var(--line-2);
+}
+#lyricsDialog[open] .focus-transport { display: flex; }
+.focus-transport button {
+  display: grid; place-items: center;
+  width: 30px; height: 30px; padding: 0;
+  border: 1px solid transparent; border-radius: 50%;
+  background: transparent; color: var(--muted);
+  cursor: pointer;
+  transition: color .2s, border-color .2s, background .2s;
+}
+.focus-transport button:hover { color: var(--cyan); border-color: rgba(140, 230, 248, .4); background: rgba(140, 230, 248, .07); }
+.focus-transport button svg { width: 16px; height: 16px; }
+.focus-transport #focusPlay {
+  width: 33px; height: 33px;
+  color: #061019;
+  background: var(--grad);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4);
+}
+.focus-transport #focusPlay:hover { color: #061019; border-color: transparent; background: var(--grad); }
+.focus-transport span {
+  margin-left: 8px;
+  font: 500 10px var(--mono); letter-spacing: .06em;
+  color: var(--muted);
+}
+@media (max-width: 720px) {
+  .lyrics-dialog .lyrics-live { display: none; }
+  .focus-transport { border-right: 0; margin-right: 0; padding-right: 0; }
+}
+@media (max-width: 420px) {
+  .focus-transport span { display: none; }
+}
+
+/* The mobile menu gets its own listen call to action. */
+.nav-listen-mobile { display: none; }
+@media (max-width: 940px) {
+  .topbar nav.mobile-open .nav-listen-mobile {
+    display: flex; align-items: center; gap: 9px;
+    margin-top: 12px; padding: 14px 14px;
+    border: 1px solid rgba(245, 231, 189, .32) !important;
+    background: linear-gradient(110deg, rgba(245, 231, 189, .1), rgba(140, 230, 248, .05));
+    color: var(--cream) !important;
+    letter-spacing: .16em;
+  }
+  .topbar nav.mobile-open .nav-listen-mobile span { color: var(--cyan); }
+}
+
+.artist-link { margin-top: clamp(22px, 2.6vw, 32px); }
+
+/* Tablet hero: keep the floating ticket clear of the copy and stop the
+   eight-stop route from wrapping onto a lonely second line. */
+@media (max-width: 1100px) and (min-width: 941px) {
+  .hero-support { width: min(360px, 100%); }
+  .hero-route {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 6px;
+  }
+  .hero-route::-webkit-scrollbar { display: none; }
+  .route-stop { flex: none; }
+}
+
+@media (max-width: 720px) {
+  .track-duration::before {
+    content: '▸';
+    margin-right: 4px;
+    color: var(--cyan);
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 1100px) and (min-width: 941px) {
+  .hero-route { mask-image: linear-gradient(90deg, #000 93%, transparent); -webkit-mask-image: linear-gradient(90deg, #000 93%, transparent); }
+}
+
+/* Comfortable hit targets for the smallest controls. */
+.speed button { min-height: 26px; }
+.nudge button { min-height: 26px; }
+.nudge #lyricsHelp { min-width: 26px; }
+
+/* Footer links meet the 24px target size from WCAG 2.2 without getting loud. */
+.footer-grid a {
+  display: inline-flex; align-items: center;
+  min-height: 24px;
+  padding: 1px 0;
 }
