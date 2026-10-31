@@ -7,27 +7,37 @@
 <meta name="theme-color" content="#04070d">
 <meta name="description" content="PHANTASMAGORIA — интерактивный фан-сайт альбома MZLFF: восемь треков, синхронный текст, история парка, герои и тур.">
 <meta name="author" content="Cnizroman">
+<link rel="canonical" href="https://cnizroman.github.io/PHANTASMAGORIA/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="MZLFF / PHANTASMAGORIA">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:url" content="https://cnizroman.github.io/PHANTASMAGORIA/">
 <meta property="og:title" content="MZLFF / PHANTASMAGORIA">
 <meta property="og:description" content="Интерактивный фан-сайт альбома PHANTASMAGORIA: плеер, синхронный текст, история и тур.">
-<meta property="og:image" content="assets/og.jpg">
+<meta property="og:image" content="https://cnizroman.github.io/PHANTASMAGORIA/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:alt" content="Обложка альбома PHANTASMAGORIA: Нюта и мишка за стеклом">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="MZLFF / PHANTASMAGORIA">
 <meta name="twitter:description" content="Восемь аттракционов, один маршрут. Слушай историю с синхронным текстом.">
-<meta name="twitter:image" content="assets/og.jpg">
+<meta name="twitter:image" content="https://cnizroman.github.io/PHANTASMAGORIA/assets/og.jpg">
+<meta name="twitter:image:alt" content="Обложка альбома PHANTASMAGORIA: Нюта и мишка за стеклом">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="apple-touch-icon" href="assets/favicon.png">
 <title>MZLFF / PHANTASMAGORIA</title>
 <link rel="preload" as="font" type="font/woff2" href="assets/fonts/manrope-cyrillic-wght-normal.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="assets/fonts/playfair-display-cyrillic-wght-normal.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/playfair-display-cyrillic-wght-italic.woff2" crossorigin>
 <link rel="stylesheet" href="fonts.css">
-<link rel="preload" as="image" href="assets/cover.jpg" fetchpriority="high">
-<link rel="preload" as="image" href="assets/hero-karusel.jpg">
+<link rel="preload" as="image" type="image/webp" href="assets/cover.webp" fetchpriority="high">
+<link rel="preload" as="image" type="image/webp" href="assets/hero-karusel.webp">
+<link rel="preconnect" href="https://github.com">
+<link rel="preconnect" href="https://objects.githubusercontent.com" crossorigin>
 <link rel="stylesheet" href="style.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"MusicAlbum","name":"PHANTASMAGORIA","byArtist":{"@type":"MusicGroup","name":"MZLFF"},"datePublished":"2025-09-26","numTracks":8,"albumProductionType":"StudioAlbum","genre":["хип-хоп","концептуальный альбом"],"description":"Концептуальный альбом MZLFF о парке развлечений, памяти и расплате."}
+{"@context":"https://schema.org","@type":"MusicAlbum","name":"PHANTASMAGORIA","byArtist":{"@type":"MusicGroup","name":"MZLFF"},"url":"https://cnizroman.github.io/PHANTASMAGORIA/","image":"https://cnizroman.github.io/PHANTASMAGORIA/assets/cover.jpg","datePublished":"2025-09-26","numTracks":8,"albumProductionType":"StudioAlbum","albumReleaseType":"AlbumRelease","genre":["хип-хоп","концептуальный альбом"],"description":"Концептуальный альбом MZLFF о парке развлечений, памяти и расплате.","track":[{"@type":"MusicRecording","name":"мало-помалу","duration":"PT2M39S"},{"@type":"MusicRecording","name":"медленный танец","duration":"PT3M7S"},{"@type":"MusicRecording","name":"phantasmagoria","duration":"PT2M12S"},{"@type":"MusicRecording","name":"карусель","duration":"PT2M26S"},{"@type":"MusicRecording","name":"комната смеха","duration":"PT2M56S"},{"@type":"MusicRecording","name":"автодром","duration":"PT2M58S"},{"@type":"MusicRecording","name":"свободное падение","duration":"PT3M21S"},{"@type":"MusicRecording","name":"эпилог","duration":"PT3M44S"}]}
 </script>
 </head>
 <body>
@@ -39,6 +49,9 @@
   <symbol id="icon-shuffle" viewBox="0 0 24 24"><path d="M4 7h3c5 0 5 10 10 10h3m-3-3 3 3-3 3M4 17h3c1.8 0 2.9-1.2 4-3m2-4c1.1-1.8 2.2-3 4-3h3m-3-3 3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="icon-repeat" viewBox="0 0 24 24"><path d="M18 8H7a4 4 0 0 0-4 4m3-7L3 8l3 3m0 5h11a4 4 0 0 0 4-4m-3 7 3-3-3-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="icon-volume" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4zm12-1a5 5 0 0 1 0 8m2-11a9 9 0 0 1 0 14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-mute" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4zm12 1 5 5m0-5-5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-expand" viewBox="0 0 24 24"><path d="M9 4H4v5m11-5h5v5m0 6v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
   <symbol id="icon-up" viewBox="0 0 24 24"><path d="M12 19V6m-6 6 6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M6 18 18 6M9 6h9v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </svg>
@@ -48,7 +61,7 @@
 
 <header class="topbar">
   <div class="scroll-progress" aria-hidden="true"><i id="scrollBar"></i></div>
-  <a class="brand" href="#top" aria-label="MZLFF / PHANTASMAGORIA — наверх"><strong>MZLFF</strong><i aria-hidden="true">/</i><span>PHANTASMAGORIA</span></a>
+  <a class="brand" href="#top"><strong>MZLFF</strong><i>/</i><span>PHANTASMAGORIA</span><span class="sr-only"> — наверх</span></a>
   <nav id="nav" aria-label="Основная навигация">
     <a href="#album">альбом</a>
     <a href="#story">история</a>
@@ -57,6 +70,7 @@
     <a href="#artist">mzlff</a>
     <a href="#tour">тур</a>
     <a href="#sources">источники</a>
+    <a class="nav-listen-mobile" href="#listen"><span aria-hidden="true">▸</span> слушать альбом</a>
   </nav>
   <a class="nav-listen" href="#listen"><span aria-hidden="true">▸</span> слушать</a>
   <button class="nav-toggle" aria-label="Открыть меню" aria-expanded="false" aria-controls="nav"><span></span><span></span><span></span></button>
@@ -87,7 +101,7 @@
             <div class="disc" aria-hidden="true"><i></i></div>
             <div class="cover-frame">
               <span class="cover-mark" aria-hidden="true">★</span>
-              <img src="assets/cover.jpg" alt="Обложка PHANTASMAGORIA" width="881" height="881" fetchpriority="high" decoding="async">
+              <picture><source type="image/webp" srcset="assets/cover.webp"><img src="assets/cover.jpg" alt="Обложка PHANTASMAGORIA" width="881" height="881" fetchpriority="high" decoding="async"></picture>
               <div class="cover-stamp">PHANTASMAGORIA<br><small>PARK OF ATTRACTIONS</small></div>
               <span class="cover-corner" aria-hidden="true">ADMIT<br>ONE</span>
             </div>
@@ -105,7 +119,7 @@
           <h2 class="hero-title"><span>Добро</span><em>пожаловать.</em></h2>
           <p class="hero-text">Сначала здесь праздник. Потом появляются зеркала, карусели, игрушки и ощущение, что аттракционы знают о тебе слишком много.</p>
           <div class="hero-actions">
-            <a class="btn" href="#listen">ВКЛЮЧИТЬ АЛЬБОМ <span class="btn-arrow" aria-hidden="true">▸</span></a>
+            <a class="btn" id="startAlbum" href="#listen">ВКЛЮЧИТЬ АЛЬБОМ <span class="btn-arrow" aria-hidden="true">▸</span></a>
             <a class="line-button" href="#story">ИСТОРИЯ <span aria-hidden="true">↓</span></a>
           </div>
           <div class="hero-platforms">
@@ -114,7 +128,7 @@
             <a href="https://music.apple.com/ru/album/phantasmagoria/1839170497" target="_blank" rel="noreferrer">APPLE MUSIC</a>
             <a href="https://www.youtube.com/watch?v=JFHYBcEt4mg" target="_blank" rel="noopener noreferrer">YOUTUBE</a>
           </div>
-          <a class="hero-support" href="https://www.donationalerts.com/r/cnizroman" target="_blank" rel="noopener noreferrer" aria-label="Поддержать автора проекта через DonationAlerts">
+          <a class="hero-support" href="https://www.donationalerts.com/r/cnizroman" target="_blank" rel="noopener noreferrer">
             <span class="hero-support-symbol" aria-hidden="true">✦</span>
             <span class="hero-support-copy">
               <small>ЕСЛИ ТЕБЕ ПОНРАВИЛСЯ ПРОЕКТ</small>
@@ -122,6 +136,7 @@
               <em>Помочь сайту развиваться и получать новые обновления</em>
             </span>
             <span class="hero-support-arrow" aria-hidden="true">↗</span>
+            <span class="sr-only">— откроется DonationAlerts в новой вкладке</span>
           </a>
         </div>
 
@@ -133,6 +148,7 @@
             <div class="ticket-barcode" aria-hidden="true"></div>
             <small>ОДНА ИСТОРИЯ · ВОСЕМЬ ТРЕКОВ</small>
             <span class="ticket-end">THE FENCE · PARK OF ATTRACTIONS</span>
+            <span class="ticket-stamp" aria-hidden="true">ПРОЙДЕНО<br><b>08 / 08</b></span>
           </div>
           <div class="scribble">Не задерживайся<br>после закрытия.</div>
         </div>
@@ -166,8 +182,8 @@
 
     <div class="story-body">
       <div class="story-collage" aria-hidden="true">
-        <figure class="collage-photo collage-a"><img src="assets/art-nyuta.jpg" alt="" width="640" height="640" loading="lazy" decoding="async"><figcaption>НЮТА · КАДР ИЗ ВИДЕО</figcaption></figure>
-        <figure class="collage-photo collage-b"><img src="assets/art-bear.jpg" alt="" width="640" height="623" loading="lazy" decoding="async"><figcaption>МИШКА · PARK OF ATTRACTIONS</figcaption></figure>
+        <figure class="collage-photo collage-a"><picture><source type="image/webp" srcset="assets/art-nyuta.webp"><img src="assets/art-nyuta.jpg" alt="" width="640" height="640" loading="lazy" decoding="async"></picture><figcaption>НЮТА · КАДР ИЗ ВИДЕО</figcaption></figure>
+        <figure class="collage-photo collage-b"><picture><source type="image/webp" srcset="assets/art-bear.webp"><img src="assets/art-bear.jpg" alt="" width="640" height="623" loading="lazy" decoding="async"></picture><figcaption>МИШКА · PARK OF ATTRACTIONS</figcaption></figure>
       </div>
 
       <div class="story-grid">
@@ -207,7 +223,7 @@
       </div>
       <div class="tracks-side">
         <p class="chapter-lead">Выбирай остановку. Музыка, обложка и синхронизированный текст переключаются вместе.</p>
-        <div class="tracks-stats"><span><b>08</b> треков</span><span><b>23:23</b> звучания</span><span><b id="heardCount">00 / 08</b> пройдено</span></div>
+        <div class="tracks-stats"><span><b>08</b> треков</span><span><b>23:23</b> звучания</span><span><b id="heardCount" aria-live="polite">00 / 08</b> пройдено</span></div>
       </div>
     </header>
     <div class="track-list-head" aria-hidden="true"><span>№</span><span>ОСТАНОВКА</span><span>ДЛИТЕЛЬНОСТЬ</span><span>ПЕРЕЙТИ</span></div>
@@ -231,10 +247,13 @@
           <div class="player-heading">
             <div class="mini-cover">
               <div class="disc" aria-hidden="true"></div>
-              <img id="nowCover" src="assets/cover.jpg" alt="Обложка текущего трека" width="128" height="128" decoding="async">
+              <picture><source id="nowCoverWebp" type="image/webp" srcset="assets/cover-320.webp"><img id="nowCover" src="assets/cover.jpg" alt="Обложка текущего трека" width="320" height="320" decoding="async"></picture>
             </div>
             <div class="player-heading-copy">
-              <span class="tiny-label">СЕЙЧАС ИГРАЕТ <i class="led" aria-hidden="true"></i></span>
+              <div class="now-meta">
+                <span class="tiny-label">СЕЙЧАС ИГРАЕТ <i class="led" aria-hidden="true"></i></span>
+                <span class="now-act" id="nowAct">АКТ I · ВХОД</span>
+              </div>
               <h3 id="nowTitle">мало-помалу</h3>
               <p id="nowDesc">Вход в парк: праздничный фасад и первые признаки того, что за весельем скрывается нечто совсем другое.</p>
             </div>
@@ -254,9 +273,19 @@
             <button id="repeat" type="button" aria-label="Повторять альбом" aria-pressed="false" title="Повторять альбом"><svg aria-hidden="true"><use href="#icon-repeat"></use></svg></button>
           </div>
           <div class="player-bottom">
-            <label class="vol"><svg aria-hidden="true"><use href="#icon-volume"></use></svg><span class="sr-only">Громкость</span><input id="volume" aria-label="Громкость" type="range" min="0" max="100" step="1" value="80"></label>
+            <div class="player-tools">
+              <button class="mute" id="mute" type="button" aria-label="Выключить звук" aria-pressed="false" title="Выключить звук"><svg aria-hidden="true"><use href="#icon-volume"></use></svg></button>
+              <label class="vol"><span class="sr-only">Громкость</span><input id="volume" aria-label="Громкость" type="range" min="0" max="100" step="1" value="80"></label>
+              <div class="speed" role="group" aria-label="Скорость воспроизведения">
+                <span class="speed-label" aria-hidden="true">СКОРОСТЬ</span>
+                <button type="button" data-rate="0.75" aria-pressed="false" aria-label="Скорость 0,75" title="Скорость 0,75">0,75×</button>
+                <button type="button" data-rate="1" aria-pressed="true" aria-label="Скорость 1" title="Обычная скорость">1×</button>
+                <button type="button" data-rate="1.25" aria-pressed="false" aria-label="Скорость 1,25" title="Скорость 1,25">1,25×</button>
+              </div>
+            </div>
             <div class="player-status" id="playerStatus" role="status"><span class="status-dot"></span><span id="statusText">Готово к прослушиванию</span></div>
           </div>
+          <div class="sr-only" id="trackAnnounce" role="status" aria-live="polite"></div>
           <div class="player-error" id="playerError" hidden><p id="errorText"></p><div><button type="button" id="retry">Попробовать снова</button><button type="button" id="errorVideo">Включить видео</button><a id="errorLink" href="https://www.youtube.com/watch?v=HIl0jzLga58" target="_blank" rel="noopener noreferrer">Открыть YouTube ↗</a></div></div>
           <div class="player-links">
             <button type="button" class="up-next" id="nextUp" title="Включить следующий трек"><span>ДАЛЕЕ</span> <b id="nextTitle">медленный танец</b> <i aria-hidden="true">▸</i></button>
@@ -270,7 +299,16 @@
       <div class="lyrics-card" id="lyricsShell">
         <div class="lyrics-header">
           <div class="lyrics-heading"><span>ТЕКСТ</span><b id="lyricsTrack">мало-помалу</b></div>
-          <span class="lyrics-live"><i></i> LIVE</span>
+          <div class="lyrics-tools">
+            <div class="focus-transport" id="focusTransport" role="group" aria-label="Управление воспроизведением">
+              <button type="button" id="focusPrev" aria-label="Предыдущий трек" title="Предыдущий трек"><svg aria-hidden="true"><use href="#icon-prev"></use></svg></button>
+              <button type="button" id="focusPlay" aria-label="Воспроизвести" title="Воспроизвести"><svg aria-hidden="true"><use href="#icon-play"></use></svg></button>
+              <button type="button" id="focusNext" aria-label="Следующий трек" title="Следующий трек"><svg aria-hidden="true"><use href="#icon-next"></use></svg></button>
+              <span id="focusTime" aria-hidden="true">00:00</span>
+            </div>
+            <span class="lyrics-live"><i></i> LIVE</span>
+            <button class="lyrics-expand" id="lyricsExpand" type="button" aria-pressed="false" aria-label="Развернуть текст на весь экран" title="Развернуть текст на весь экран"><svg aria-hidden="true"><use href="#icon-expand"></use></svg><span>РАЗВЕРНУТЬ</span></button>
+          </div>
         </div>
         <div class="lyrics-body">
           <div id="lyrics" class="lyrics" tabindex="0" aria-label="Текст текущего трека"><p class="lyrics-empty" role="status">Загрузка текста…</p></div>
@@ -294,7 +332,7 @@
       </div>
     </header>
     <div class="artist-grid">
-      <div class="artist-image"><img src="assets/artist.jpg" alt="MZLFF" loading="lazy" width="964" height="1280" decoding="async"><span class="photo-tape" aria-hidden="true"></span></div>
+      <div class="artist-image"><picture><source type="image/webp" srcset="assets/artist.webp"><img src="assets/artist.jpg" alt="MZLFF" loading="lazy" width="964" height="1280" decoding="async"></picture><span class="photo-tape" aria-hidden="true"></span></div>
       <div class="artist-info">
         <span class="tiny-label">ИСТОРИЯ АРТИСТА</span>
         <p class="artist-lead">MZLFF — музыкант, стример и баттл-рэпер. Его ранний путь связан с интернет-культурой, стримами и баттл-рэпом, а затем постепенно сместился к самостоятельным альбомам и масштабным концептуальным проектам.</p>
@@ -306,6 +344,7 @@
           <div><b>2024</b><span>«светлая сторона»</span></div>
           <div class="is-now"><b>2025</b><span>ADHD → PHANTASMAGORIA</span></div>
         </div>
+        <a class="line-button artist-link" href="https://t.me/mazellovvv" target="_blank" rel="noreferrer">ОФИЦИАЛЬНЫЙ КАНАЛ MZLFF <span aria-hidden="true">↗</span></a>
       </div>
     </div>
   </section>
@@ -322,16 +361,69 @@
     <div class="tour-grid">
       <div class="tour-poster-large">
         <div class="bulbs" aria-hidden="true"></div>
-        <img src="assets/poster.jpg" alt="Официальный постер PHANTASMAGORIA TOUR" loading="lazy" width="1200" height="1199" decoding="async">
+        <picture><source type="image/webp" srcset="assets/poster.webp"><img src="assets/poster.jpg" alt="Официальный постер PHANTASMAGORIA TOUR" loading="lazy" width="1200" height="1199" decoding="async"></picture>
         <span class="poster-caption">MZLFF.TOURS · ОФИЦИАЛЬНЫЙ ПОСТЕР</span>
       </div>
       <div class="tour-copy">
         <span class="tiny-label">THE PARK LEAVES THE SCREEN</span>
-        <p class="tour-lead">Осенью 2025 концертные площадки превращались в парк развлечений PHANTASMAGORIA. Тур соединял песни альбома с общей атмосферой его мира.</p>
-        <p>Здесь оставлен официальный постер как документ эпохи релиза, а не отдельная «галерея»: визуал встроен прямо в историю тура.</p>
-        <div class="tour-facts"><span><b>26</b> городов</span><span><b>окт—дек</b> 2025</span><span><b>18+</b> атмосфера</span></div>
+        <p class="tour-lead">Осенью 2025 концертные площадки на месяц с лишним превращались в парк развлечений PHANTASMAGORIA. Тур соединял песни альбома с общей атмосферой его мира.</p>
+        <p>Здесь оставлен официальный постер как документ эпохи релиза, а не отдельная «галерея»: визуал встроен прямо в историю тура. Под ним — полный маршрут из постера, чтобы даты не пришлось разбирать по мелкому шрифту.</p>
+        <div class="tour-facts"><span><b>28</b> концертов</span><span><b>24</b> города</span><span><b>12+</b> маркировка</span></div>
         <a class="btn" href="https://t.me/tour_mzlff" target="_blank" rel="noreferrer">ОФИЦИАЛЬНЫЙ ТУР <span class="btn-arrow" aria-hidden="true">↗</span></a>
       </div>
+    </div>
+
+    <div class="tour-schedule">
+      <div class="tour-schedule-head">
+        <span class="tiny-label">АРХИВ МАРШРУТА</span>
+        <span>ОКТЯБРЬ — ДЕКАБРЬ 2025</span>
+      </div>
+      <div class="tour-months">
+        <div class="tour-month">
+          <h3>Октябрь <i>14 концертов</i></h3>
+          <ol>
+            <li><b>10.10</b><span>Краснодар</span></li>
+            <li><b>11.10</b><span>Ростов-на-Дону</span></li>
+            <li><b>12.10</b><span>Волгоград</span></li>
+            <li><b>14.10</b><span>Воронеж</span></li>
+            <li><b>15.10</b><span>Саратов</span></li>
+            <li><b>16.10</b><span>Самара</span></li>
+            <li><b>17.10</b><span>Казань</span></li>
+            <li><b>19.10</b><span>Уфа</span></li>
+            <li><b>21.10</b><span>Челябинск</span></li>
+            <li><b>24.10</b><span>Пермь</span></li>
+            <li><b>26.10</b><span>Екатеринбург</span></li>
+            <li><b>27.10</b><span>Тюмень</span></li>
+            <li><b>29.10</b><span>Омск</span></li>
+            <li><b>31.10</b><span>Алматы</span></li>
+          </ol>
+        </div>
+        <div class="tour-month">
+          <h3>Ноябрь <i>9 концертов</i></h3>
+          <ol>
+            <li><b>02.11</b><span>Астана</span></li>
+            <li><b>03.11</b><span>Новосибирск</span></li>
+            <li><b>05.11</b><span>Новосибирск</span></li>
+            <li><b>06.11</b><span>Красноярск</span></li>
+            <li><b>07.11</b><span>Иркутск</span></li>
+            <li><b>08.11</b><span>Хабаровск</span></li>
+            <li><b>09.11</b><span>Владивосток</span></li>
+            <li><b>11.11</b><span>Владивосток</span></li>
+            <li><b>23.11</b><span>Калининград</span></li>
+          </ol>
+        </div>
+        <div class="tour-month">
+          <h3>Декабрь <i>5 концертов</i></h3>
+          <ol>
+            <li><b>07.12</b><span>Нижний Новгород</span></li>
+            <li><b>13.12</b><span>Санкт-Петербург</span></li>
+            <li><b>14.12</b><span>Санкт-Петербург</span></li>
+            <li><b>19.12</b><span>Москва</span></li>
+            <li><b>20.12</b><span>Москва</span></li>
+          </ol>
+        </div>
+      </div>
+      <p class="tour-note">Даты и маркировка — по официальному постеру MZLFF.TOURS. Повторы городов в списке означают отдельные концерты.</p>
     </div>
   </section>
 
@@ -373,11 +465,12 @@
 
 <div class="mini-player" id="miniPlayer" hidden aria-label="Мини-плеер">
   <div class="mini-progress" aria-hidden="true"><span id="miniProgress"></span></div>
-  <a class="mini-info" href="#listen"><img id="miniCover" src="assets/cover.jpg" alt="" width="42" height="42"><span><small>СЕЙЧАС ИГРАЕТ</small><b id="miniTitle">мало-помалу</b></span></a>
+  <a class="mini-info" href="#listen"><img id="miniCover" src="assets/cover-320.webp" alt="" width="42" height="42"><span><small>СЕЙЧАС ИГРАЕТ</small><b id="miniTitle">мало-помалу</b></span></a>
   <span id="miniTime" class="mini-time">00:00</span>
   <button type="button" id="miniPlay" aria-label="Воспроизвести"><svg aria-hidden="true"><use href="#icon-play"></use></svg></button>
   <button type="button" id="miniNext" aria-label="Следующий трек"><svg aria-hidden="true"><use href="#icon-next"></use></svg></button>
 </div>
+<dialog class="lyrics-dialog" id="lyricsDialog" aria-label="Текст текущего трека"></dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <button class="to-top" id="toTop" type="button" aria-label="Наверх" title="Наверх" hidden><svg aria-hidden="true"><use href="#icon-up"></use></svg></button>
 <noscript><p class="no-script">Для плеера и текста нужен JavaScript. Альбом можно послушать <a href="https://www.youtube.com/watch?v=HIl0jzLga58">на YouTube</a>.</p></noscript>

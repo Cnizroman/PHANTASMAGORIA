@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cnizroman.github.io/PHANTASMAGORIA/sitemap.xml

@@ -29,6 +29,9 @@ const HEARD_KEY = 'ph:heard:v1';
 let heard = {};
 try { heard = JSON.parse(store.get(HEARD_KEY, '{}')) || {}; } catch (_) { heard = {}; }
 if (!heard || typeof heard !== 'object') heard = {};
+let lastHeardCount = null;
+let albumComplete = store.get('ph:complete', '0') === '1';
+let initialLoadDone = false;
 const escapeHTML = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const reducedMotion = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 const scrollBehavior = () => reducedMotion() ? 'auto' : 'smooth';
@@ -71,14 +74,36 @@ function renderTracks() {
   list.innerHTML = tracks.map((track, index) => `
     <button class="track" type="button" data-i="${index}">
       <span class="track-no">${String(track.n).padStart(2, '0')}</span>
-      <span class="track-copy"><span class="track-name">${escapeHTML(track.title)}</span><span class="track-progress" aria-hidden="true"><i></i></span><span class="track-desc">${escapeHTML(track.desc)}</span></span>
-      <span class="track-time">${formatTime(track.seconds)}</span><span class="track-go"><span class="go-label">СЛУШАТЬ </span><span aria-hidden="true">↗</span></span>
+      <span class="track-copy"><span class="track-name">${escapeHTML(track.title)}</span><span class="track-desc">${escapeHTML(track.desc)}</span></span>
+      <span class="track-time"><span class="track-duration">${formatTime(track.seconds)}</span><span class="track-progress" aria-hidden="true"><i></i></span></span><span class="track-go"><span class="go-label">СЛУШАТЬ </span><span aria-hidden="true">↗</span><span class="eq" aria-hidden="true"><i></i><i></i><i></i></span></span>
     </button>`).join('');
-  $$('.track').forEach(button => button.addEventListener('click', () => {
-    loadTrack(Number(button.dataset.i), true);
-    $('#listen').scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
-  }));
+  $$('.track').forEach(button => {
+    const index = Number(button.dataset.i);
+    button.addEventListener('click', () => {
+      loadTrack(index, true);
+      $('#listen').scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
+    });
+    // Warm the next audio file only when a visitor shows intent, never on load.
+    const warm = () => prefetchTrack(tracks[index]);
+    button.addEventListener('pointerenter', warm, { passive: true });
+    button.addEventListener('focus', warm);
+  });
   paintHeard();
+}
+
+// The release host redirects to a signed CDN URL, so a prefetch hint is the
+// cheapest way to make the next click feel instant without touching preload.
+const prefetched = new Set();
+function prefetchTrack(track) {
+  const connection = navigator.connection;
+  if (connection && (connection.saveData || /(^|-)2g$/.test(connection.effectiveType || ''))) return;
+  if (prefetched.has(track.key) || prefetched.size >= 4) return;
+  prefetched.add(track.key);
+  const link = document.createElement('link');
+  link.rel = 'prefetch';
+  link.as = 'audio';
+  link.href = `${RELEASE}${track.key}.mp3`;
+  document.head.appendChild(link);
 }
 
 // How far the visitor has travelled through each stop is remembered locally,
@@ -90,11 +115,30 @@ function paintHeard() {
     if (value >= 0.9) done++;
     const bar = element.querySelector('.track-progress i');
     if (bar) bar.style.width = `${Math.round(value * 100)}%`;
+    element.style.setProperty('--heard', `${Math.round(value * 100)}%`);
     element.classList.toggle('heard', value >= 0.9);
     element.classList.toggle('heard-part', value > 0 && value < 0.9);
   });
   const counter = $('#heardCount');
   if (counter) counter.textContent = `${String(done).padStart(2, '0')} / 08`;
+  // Celebrate only when the route is completed in this visit, not on every load.
+  const justCompleted = lastHeardCount !== null && done === tracks.length && lastHeardCount < done;
+  if (done === tracks.length && !albumComplete) {
+    albumComplete = true;
+    store.set('ph:complete', '1');
+  }
+  if (justCompleted) celebrateAlbum();
+  lastHeardCount = done;
+  if (albumComplete) {
+    const ticket = $('.hero-ticket');
+    if (ticket) ticket.classList.add('is-stamped');
+  }
+}
+
+function celebrateAlbum() {
+  const ticket = $('.hero-ticket');
+  if (ticket) ticket.classList.add('is-stamped');
+  setTimeout(() => showToast('Маршрут пройден: 08 / 08. Билет пробит.'), 700);
 }
 
 function recordHeard() {
@@ -143,7 +187,7 @@ function renderChars() {
   $('#charGrid').innerHTML = window.CHARS.map(character => `
     <article class="char">
       <a class="char-image" href="${escapeHTML(character.video)}" target="_blank" rel="noopener noreferrer" aria-label="Открыть видео: ${escapeHTML(character.name)}">
-        <img src="${escapeHTML(character.image)}" alt="${escapeHTML(character.alt)}" width="1280" height="720" loading="lazy">
+        <picture><source type="image/webp" srcset="${escapeHTML(character.image.replace(/\.(jpg|png)$/, '.webp'))}"><img src="${escapeHTML(character.image)}" alt="${escapeHTML(character.alt)}" width="1280" height="720" loading="lazy" decoding="async"></picture>
         <span class="char-watch" aria-hidden="true">▸ Смотреть кадр</span>
         <span class="char-image-number" aria-hidden="true">✦</span>
       </a>
@@ -301,13 +345,21 @@ function showToast(message) {
 function updatePlayButtons() {
   const icon = desiredPlaying ? '#icon-pause' : '#icon-play';
   const label = desiredPlaying ? 'Пауза' : 'Воспроизвести';
-  for (const button of [$('#play'), $('#miniPlay')]) {
+  for (const button of [$('#play'), $('#miniPlay'), $('#focusPlay')]) {
+    if (!button) continue;
     button.querySelector('use').setAttribute('href', icon);
     button.setAttribute('aria-label', label);
     button.title = label;
   }
   $('#viz').classList.toggle('is-playing', desiredPlaying);
   for (const card of $$('.player-card, .lyrics-card')) card.classList.toggle('is-playing', desiredPlaying);
+  // The tracklist doubles as a transport, so the playing stop gets an equaliser.
+  $$('.track').forEach((element, index) => {
+    const playing = desiredPlaying && index === current;
+    element.classList.toggle('is-playing', playing);
+    const goLabel = element.querySelector('.go-label');
+    if (goLabel) goLabel.textContent = playing ? 'ИГРАЕТ ' : 'СЛУШАТЬ ';
+  });
   if ('mediaSession' in navigator) {
     try { navigator.mediaSession.playbackState = desiredPlaying ? 'playing' : 'paused'; } catch (_) { /* unsupported */ }
   }
@@ -383,6 +435,8 @@ function updateTime(forceLyrics = false) {
   $('#currentTime').textContent = formatTime(position);
   $('#duration').textContent = formatTime(duration);
   $('#miniTime').textContent = formatTime(position);
+  const focusTime = $('#focusTime');
+  if (focusTime) focusTime.textContent = formatTime(position);
   $('#miniProgress').style.width = `${duration ? position / duration * 100 : 0}%`;
   if (lyricsShell) lyricsShell.style.setProperty('--lyrics-progress', `${duration ? Math.min(100, position / duration * 100) : 0}%`);
   const viz = $('#viz');
@@ -427,11 +481,25 @@ function swapPlayerHeading() {
 function updateTrackUI(track) {
   $('#nowTitle').textContent = track.title;
   $('#nowDesc').textContent = track.desc;
-  $('#nowCover').src = track.cover;
-  $('#nowCover').alt = `Иллюстрация к треку «${track.title}»`;
+  const story = window.STORY && window.STORY[track.key];
+  const act = $('#nowAct');
+  if (act) act.textContent = story ? story.act : 'ТРЕК';
+  if (initialLoadDone) {
+    const announce = $('#trackAnnounce');
+    if (announce) announce.textContent = `Трек ${track.n} из ${tracks.length}: ${track.title}. ${story ? story.act : ''}`;
+  }
+  const webpCover = track.cover.replace(/\.(jpg|png)$/, '.webp');
+  const smallCover = track.cover.replace(/\.(jpg|png)$/, '-320.webp');
+  const nowCover = $('#nowCover');
+  nowCover.src = track.cover;
+  nowCover.alt = `Иллюстрация к треку «${track.title}»`;
+  const nowCoverWebp = $('#nowCoverWebp');
+  if (nowCoverWebp) nowCoverWebp.srcset = smallCover;
   const playerCard = document.querySelector('.player-card');
-  if (playerCard) playerCard.style.setProperty('--cover-art', `url('${track.cover}')`);
-  $('#miniCover').src = track.cover;
+  if (playerCard) playerCard.style.setProperty('--cover-art', `url('${webpCover}')`);
+  const miniCover = $('#miniCover');
+  miniCover.onerror = () => { miniCover.onerror = null; miniCover.src = track.cover; };
+  miniCover.src = smallCover;
   $('#miniTitle').textContent = track.title;
   $('#trackCounter').textContent = `${String(track.n).padStart(2, '0')} / 08`;
   swapPlayerHeading();
@@ -450,6 +518,11 @@ function updateTrackUI(track) {
     element.setAttribute('aria-current', String(index === current));
     element.classList.toggle('is-current', index === current);
   });
+  $$('.plot-step').forEach((element, index) => {
+    element.classList.toggle('is-current', index === current);
+    if (index === current) element.setAttribute('aria-current', 'true');
+    else element.removeAttribute('aria-current');
+  });
   setMediaMetadata(track);
 }
 
@@ -465,6 +538,8 @@ function loadTrack(index, autoplay = false, initialPosition = 0) {
   const track = tracks[current];
   // Do not call load() here: preload="none" must not download every track on page load.
   audio.src = `${RELEASE}${track.key}.mp3`;
+  audio.playbackRate = rate;
+  audio.defaultPlaybackRate = rate;
   audioPendingSeek = initialPosition > 0 ? clamp(initialPosition, 0, track.seconds) : null;
   youtubePendingSeek = initialPosition > 0 ? clamp(initialPosition, 0, track.seconds) : 0;
   youtubeVideoId = null;
@@ -528,6 +603,7 @@ function createYoutubePlayer(attempt) {
           youtubeReady = true;
           youtubeLoading = false;
           try { youtubePlayer.setVolume(Number(volume.value)); } catch (_) { /* optional */ }
+          try { youtubePlayer.setPlaybackRate(rate); } catch (_) { /* optional */ }
           if (provider === 'youtube') cueYoutube(desiredPlaying);
           else {
             try { youtubePlayer.pauseVideo(); } catch (_) { /* optional */ }
@@ -616,6 +692,7 @@ function cueYoutube(autoplay) {
   updatePlayButtons();
   try {
     youtubePlayer.setVolume(Number(volume.value));
+    try { youtubePlayer.setPlaybackRate(rate); } catch (_) { /* optional */ }
     if (autoplay) {
       markStarted();
       clearError();
@@ -738,11 +815,24 @@ const waveHeights = Array.from({ length: 56 }, (_, index) => Math.round(14 + 52 
 $('#viz').innerHTML = waveHeights.map((height, index) => `<span style="--bar:${height}%;--delay:${(index % 8) * -0.1}s"></span>`).join('');
 
 $('#play').addEventListener('click', togglePlayback);
+// "Включить альбом" starts the recorded stop instead of only scrolling to it.
+const startAlbum = $('#startAlbum');
+if (startAlbum) startAlbum.addEventListener('click', () => {
+  setTimeout(() => { if (!desiredPlaying) play(); }, 420);
+});
 $('#miniPlay').addEventListener('click', togglePlayback);
+$('#focusPlay').addEventListener('click', togglePlayback);
+$('#focusPrev').addEventListener('click', previous);
+$('#focusNext').addEventListener('click', () => next(true));
 $('#prev').addEventListener('click', previous);
 $('#next').addEventListener('click', () => next(true));
 $('#nextUp').addEventListener('click', () => next(true));
 $('#miniNext').addEventListener('click', () => next(true));
+for (const button of [$('#next'), $('#miniNext'), $('#nextUp')]) {
+  const warmNext = () => { if (!shuffle) prefetchTrack(tracks[(current + 1) % tracks.length]); };
+  button.addEventListener('pointerenter', warmNext, { passive: true });
+  button.addEventListener('focus', warmNext);
+}
 $('#sourceAudio').addEventListener('click', () => setProvider('audio'));
 $('#sourceVideo').addEventListener('click', () => setProvider('youtube'));
 $('#errorVideo').addEventListener('click', () => setProvider('youtube', true));
@@ -772,21 +862,76 @@ $('#repeat').addEventListener('click', event => {
 });
 
 const savedVolume = Number(store.get('ph:vol', 0.8));
-volume.value = String(Math.round(clamp(Number.isFinite(savedVolume) ? savedVolume : 0.8, 0, 1) * 100));
+const restoredVolume = clamp(Number.isFinite(savedVolume) ? savedVolume : 0.8, 0, 1);
+volume.value = String(Math.round(restoredVolume * 100));
 volume.style.setProperty('--p', `${volume.value}%`);
-audio.volume = Number(volume.value) / 100;
-volume.addEventListener('input', () => {
-  const value = Number(volume.value);
-  volume.style.setProperty('--p', `${value}%`);
-  audio.volume = value / 100;
-  store.set('ph:vol', value / 100);
+audio.volume = restoredVolume;
+let lastVolume = clamp(Number(store.get('ph:vol:last', 0.8)) || 0.8, 0.05, 1);
+let muted = restoredVolume === 0;
+
+function updateMuteUI() {
+  const button = $('#mute');
+  if (!button) return;
+  const label = muted ? 'Включить звук' : 'Выключить звук';
+  button.setAttribute('aria-pressed', String(muted));
+  button.setAttribute('aria-label', label);
+  button.title = label;
+  button.querySelector('use').setAttribute('href', muted ? '#icon-mute' : '#icon-volume');
+}
+
+function applyVolume(next, remember = true) {
+  const value = clamp(Number(next) / 100, 0, 1);
+  const wasMuted = muted;
+  volume.value = String(Math.round(value * 100));
+  volume.style.setProperty('--p', `${volume.value}%`);
+  audio.volume = value;
+  muted = value === 0;
+  if (remember && value > 0) {
+    lastVolume = value;
+    store.set('ph:vol:last', value);
+  }
+  store.set('ph:vol', value);
   if (youtubeReady && youtubePlayer) {
     try {
-      youtubePlayer.setVolume(value);
-      if (value > 0 && youtubePlayer.isMuted()) youtubePlayer.unMute();
+      youtubePlayer.setVolume(Math.round(value * 100));
+      if (muted) youtubePlayer.mute();
+      else if (wasMuted) youtubePlayer.unMute();
     } catch (_) { /* optional */ }
   }
-});
+  updateMuteUI();
+}
+
+function toggleMute() {
+  if (muted || Number(volume.value) === 0) applyVolume(Math.round(lastVolume * 100));
+  else applyVolume(0, false);
+  showToast(muted ? 'Звук выключен' : 'Звук включён');
+}
+
+volume.addEventListener('input', () => applyVolume(Number(volume.value)));
+$('#mute').addEventListener('click', toggleMute);
+updateMuteUI();
+
+/* Playback speed: the album reads faster or slower without changing pitch. */
+const SPEEDS = [0.75, 1, 1.25];
+let rate = Number(store.get('ph:rate', 1));
+if (!SPEEDS.includes(rate)) rate = 1;
+
+function applyRate(value, announce = true) {
+  rate = SPEEDS.includes(Number(value)) ? Number(value) : 1;
+  audio.playbackRate = rate;
+  audio.defaultPlaybackRate = rate;
+  $$('.speed button').forEach(button => {
+    button.setAttribute('aria-pressed', String(Number(button.dataset.rate) === rate));
+  });
+  store.set('ph:rate', rate);
+  if (youtubeReady && youtubePlayer) {
+    try { youtubePlayer.setPlaybackRate(rate); } catch (_) { /* optional */ }
+  }
+  if (announce) showToast(`Скорость ${String(rate).replace('.', ',')}×`);
+}
+
+$$('.speed button').forEach(button => button.addEventListener('click', () => applyRate(button.dataset.rate)));
+applyRate(rate, false);
 seek.addEventListener('input', () => {
   draggingSeek = true;
   setPosition(Number(seek.value) / 1000 * getDuration());
@@ -806,6 +951,55 @@ $('#offMinus').addEventListener('click', () => setOffset(delay - 0.5));
 $('#offPlus').addEventListener('click', () => setOffset(delay + 0.5));
 $('#offReset').addEventListener('click', () => setOffset(0));
 $('#lyricsHelp').addEventListener('click', () => showToast('−0.5 показывает строки раньше, +0.5 — позже. Сдвиг сохраняется отдельно для каждого трека. Нажми на значение, чтобы сбросить.'));
+
+/* Full-screen reading mode. The card moves into a native modal, so the rest of
+   the page becomes inert and Escape / focus handling come from the browser. */
+const lyricsDialog = $('#lyricsDialog');
+const lyricsHome = lyricsShell.parentNode;
+const lyricsAnchor = lyricsShell.nextSibling;
+const lyricsExpand = $('#lyricsExpand');
+let lyricsFocused = false;
+
+function paintLyricsButton(focused) {
+  lyricsExpand.setAttribute('aria-pressed', String(focused));
+  const label = focused ? 'Свернуть текст' : 'Развернуть текст на весь экран';
+  lyricsExpand.setAttribute('aria-label', label);
+  lyricsExpand.title = label;
+  lyricsExpand.querySelector('use').setAttribute('href', focused ? '#icon-close' : '#icon-expand');
+  lyricsExpand.querySelector('span').textContent = focused ? 'СВЕРНУТЬ' : 'РАЗВЕРНУТЬ';
+}
+
+function restoreLyricsCard() {
+  if (!lyricsFocused) return;
+  lyricsFocused = false;
+  document.body.classList.remove('is-lyrics-focus');
+  lyricsHome.insertBefore(lyricsShell, lyricsAnchor);
+  paintLyricsButton(false);
+  lyricsExpand.focus({ preventScroll: true });
+  updateLyrics(true);
+}
+
+if (lyricsDialog && typeof lyricsDialog.showModal === 'function') {
+  lyricsExpand.addEventListener('click', () => {
+    if (lyricsFocused) { lyricsDialog.close(); return; }
+    lyricsDialog.appendChild(lyricsShell);
+    lyricsFocused = true;
+    lyricsDialog.showModal();
+    document.body.classList.add('is-lyrics-focus');
+    paintLyricsButton(true);
+    setFollow(true);
+    updateLyrics(true);
+    $('#lyrics').focus({ preventScroll: true });
+    requestAnimationFrame(() => { if (lyricsFocused) { setFollow(true); updateLyrics(true); } });
+  });
+  lyricsDialog.addEventListener('close', restoreLyricsCard);
+  // A click on the backdrop lands on the dialog element itself.
+  lyricsDialog.addEventListener('click', event => {
+    if (event.target === lyricsDialog) lyricsDialog.close();
+  });
+} else {
+  lyricsExpand.hidden = true;
+}
 
 $('#shareTrack').addEventListener('click', async () => {
   const url = new URL(location.href);
@@ -887,38 +1081,36 @@ addEventListener('keydown', event => {
   if (event.key === 'ArrowRight') { event.preventDefault(); next(true); return; }
   if (event.key === 'ArrowLeft') { event.preventDefault(); previous(); return; }
   if (event.key === 'm' || event.key === 'M' || event.key === 'ь' || event.key === 'Ь') {
-    const muted = Number(volume.value) === 0;
-    if (muted) {
-      const restored = Number(store.get('ph:vol:last', 0.8));
-      volume.value = String(Math.round(clamp(Number.isFinite(restored) ? restored : 0.8, 0.05, 1) * 100));
-    } else {
-      store.set('ph:vol:last', (Number(volume.value) || 80) / 100);
-      volume.value = '0';
-    }
-    volume.dispatchEvent(new Event('input', { bubbles: true }));
-    showToast(muted ? 'Звук включён' : 'Звук выключен');
+    toggleMute();
   }
 });
 
 /* Navigation, section visibility, and the mini-player. */
 const nav = $('.topbar nav');
 const navToggle = $('.nav-toggle');
-navToggle.addEventListener('click', () => {
-  const open = nav.classList.toggle('mobile-open');
+
+function setNavOpen(open, moveFocus = false) {
+  const wasOpen = nav.classList.contains('mobile-open');
+  nav.classList.toggle('mobile-open', open);
   navToggle.setAttribute('aria-expanded', String(open));
   navToggle.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
-});
-$$('.topbar nav a').forEach(link => link.addEventListener('click', () => {
-  nav.classList.remove('mobile-open');
-  navToggle.setAttribute('aria-expanded', 'false');
-  navToggle.setAttribute('aria-label', 'Открыть меню');
-}));
-addEventListener('keydown', event => {
-  if (event.key === 'Escape') {
-    nav.classList.remove('mobile-open');
-    navToggle.setAttribute('aria-expanded', 'false');
-    navToggle.setAttribute('aria-label', 'Открыть меню');
+  if (open && !wasOpen && moveFocus) {
+    const first = nav.querySelector('a');
+    if (first) first.focus({ preventScroll: true });
   }
+}
+
+navToggle.addEventListener('click', () => setNavOpen(!nav.classList.contains('mobile-open'), true));
+$$('.topbar nav a').forEach(link => link.addEventListener('click', () => setNavOpen(false)));
+addEventListener('keydown', event => {
+  if (event.key === 'Escape' && nav.classList.contains('mobile-open')) {
+    setNavOpen(false);
+    navToggle.focus({ preventScroll: true });
+  }
+});
+document.addEventListener('pointerdown', event => {
+  if (!nav.classList.contains('mobile-open') || event.target.closest('.topbar')) return;
+  setNavOpen(false);
 });
 if ('IntersectionObserver' in window) {
   document.documentElement.classList.add('has-reveal');
@@ -928,7 +1120,13 @@ if ('IntersectionObserver' in window) {
   $$('.reveal').forEach(element => revealObserver.observe(element));
   const links = $$('.topbar nav a');
   const sectionObserver = new IntersectionObserver(entries => entries.forEach(entry => {
-    if (entry.isIntersecting) links.forEach(link => link.classList.toggle('on', link.getAttribute('href') === `#${entry.target.id}`));
+    if (!entry.isIntersecting) return;
+    links.forEach(link => {
+      const active = link.getAttribute('href') === `#${entry.target.id}`;
+      link.classList.toggle('on', active);
+      if (active) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
   }), { rootMargin: '-45% 0px -50% 0px' });
   $$('main section[id]').forEach(section => sectionObserver.observe(section));
   const controlsObserver = new IntersectionObserver(entries => {
@@ -951,3 +1149,4 @@ const savedIndex = Number(store.get('ph:track', 0));
 const initialIndex = linkedIndex >= 0 ? linkedIndex : clamp(Number.isInteger(savedIndex) ? savedIndex : 0, 0, tracks.length - 1);
 const linkedTime = linkedIndex >= 0 ? Number(params.get('t')) : 0;
 loadTrack(initialIndex, false, Number.isFinite(linkedTime) ? Math.max(0, linkedTime) : 0);
+initialLoadDone = true;

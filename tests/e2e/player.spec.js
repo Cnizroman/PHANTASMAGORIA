@@ -247,7 +247,7 @@ test('page has no WCAG A/AA accessibility violations while playing', async ({ pa
   await startAudio(page);
   await page.locator('.lyric-line[data-index="6"]').click();
   await expect(page.locator('.lyric-line[data-index="6"]')).toHaveAttribute('aria-current', 'true');
-  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();
   expect(results.violations.map(({ id, impact, nodes }) => ({ id, impact, targets: nodes.map(node => node.target) }))).toEqual([]);
 });
 
@@ -298,4 +298,66 @@ test('when clipboard access is denied the shareable link is placed in the addres
   expect(url.searchParams.get('track')).toBe('01-malo-pomalu');
   expect(Number(url.searchParams.get('t'))).toBeGreaterThanOrEqual(27);
   expect(url.hash).toBe('#listen');
+});
+
+test('reading mode opens the lyrics in a modal and restores them on Escape', async ({ page }) => {
+  await page.goto('/');
+  const dialog = page.locator('#lyricsDialog');
+  await expect(dialog).not.toHaveAttribute('open', '');
+  await page.locator('#lyricsExpand').click();
+  await expect(dialog).toHaveAttribute('open', '');
+  await expect(page.locator('#lyricsExpand')).toHaveAttribute('aria-pressed', 'true');
+  expect(await page.evaluate(() => document.querySelector('#lyricsDialog').contains(document.querySelector('#lyricsShell')))).toBe(true);
+  await expect(page.locator('.lyrics-card')).toBeVisible();
+  await page.locator('#focusPlay').click();
+  await expect(page.locator('#playerStatus')).toHaveAttribute('data-state', 'playing');
+  await expect(page.locator('#focusPlay')).toHaveAttribute('aria-label', 'Пауза');
+  await page.keyboard.press('Escape');
+  await expect(dialog).not.toHaveAttribute('open', '');
+  await expect(page.locator('#lyricsExpand')).toHaveAttribute('aria-pressed', 'false');
+  expect(await page.evaluate(() => document.querySelector('.player-layout').contains(document.querySelector('#lyricsShell')))).toBe(true);
+  await expect(page.locator('#lyricsExpand')).toBeFocused();
+});
+
+test('speed and mute controls drive the audio element', async ({ page }) => {
+  await page.goto('/');
+  await startAudio(page);
+  await page.locator('.speed button[data-rate="1.25"]').click();
+  await expect(page.locator('.speed button[data-rate="1.25"]')).toHaveAttribute('aria-pressed', 'true');
+  expect(await page.locator('#audio').evaluate(audio => audio.playbackRate)).toBeCloseTo(1.25);
+  await page.locator('#mute').click();
+  await expect(page.locator('#mute')).toHaveAttribute('aria-pressed', 'true');
+  expect(await page.locator('#audio').evaluate(audio => audio.volume)).toBe(0);
+  await page.locator('#mute').click();
+  await expect(page.locator('#mute')).toHaveAttribute('aria-pressed', 'false');
+  expect(await page.locator('#audio').evaluate(audio => audio.volume)).toBeCloseTo(.8);
+});
+
+test('the tour archive mirrors the official poster', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.tour-month')).toHaveCount(3);
+  await expect(page.locator('.tour-month li')).toHaveCount(28);
+  await expect(page.locator('.tour-facts')).toContainText('28');
+  await expect(page.locator('.tour-facts')).toContainText('24');
+  await expect(page.locator('.tour-facts')).toContainText('12+');
+});
+
+test('a completed route stamps the hero ticket', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('ph:heard:v1', JSON.stringify({
+      '01-malo-pomalu': 1, '02-medlennyy-tanec': 1, '03-phantasmagoria': 1, '04-karusel': 1,
+      '05-komnata-smeha': 1, '06-avtodrom': 1, '07-svobodnoe-padenie': 1, '08-epilog': 1
+    }));
+  });
+  await page.goto('/');
+  await expect(page.locator('#heardCount')).toHaveText('08 / 08');
+  await expect(page.locator('.hero-ticket')).toHaveClass(/is-stamped/);
+});
+
+test('the hero call to action starts the album', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('#startAlbum').click();
+  await expect(page.locator('#playerStatus')).toHaveAttribute('data-state', 'playing');
+  await expect(page.locator('#audio')).toHaveJSProperty('paused', false);
+  await expect(page.locator('#trackList .track[data-i="0"]')).toHaveClass(/is-playing/);
 });
