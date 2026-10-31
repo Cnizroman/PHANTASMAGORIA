@@ -2468,3 +2468,63 @@ audio { display: none; }
 
 /* The listening room ends closer to its content than the other chapters. */
 .listen { padding-bottom: clamp(52px, 6vw, 88px); }
+
+
+/* Creator support link: a visible invitation inside the homepage hero. */
+.hero-support {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: min(460px, 100%);
+  margin-top: clamp(20px, 2.5vw, 28px);
+  padding: 13px 15px;
+  border: 1px solid rgba(140, 230, 248, .2);
+  background: linear-gradient(110deg, rgba(140, 230, 248, .075), rgba(171, 156, 242, .045) 58%, rgba(243, 169, 198, .035));
+  color: var(--paper);
+  text-decoration: none;
+  transition: border-color .25s, background .25s, transform .25s var(--ease), box-shadow .25s;
+}
+.hero-support:hover {
+  border-color: rgba(140, 230, 248, .55);
+  background: linear-gradient(110deg, rgba(140, 230, 248, .12), rgba(171, 156, 242, .08) 58%, rgba(243, 169, 198, .06));
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .2), 0 0 24px rgba(140, 230, 248, .06);
+  transform: translateY(-2px);
+}
+.hero-support-symbol {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(140, 230, 248, .22);
+  color: var(--cream);
+  font-size: 17px;
+  background: rgba(4, 7, 13, .42);
+}
+.hero-support-copy { display: grid; gap: 3px; min-width: 0; }
+.hero-support-copy small {
+  color: var(--cyan);
+  font: 500 8px/1.4 var(--mono);
+  letter-spacing: .16em;
+}
+.hero-support-copy b {
+  color: var(--ink);
+  font: 500 17px/1.25 var(--serif);
+}
+.hero-support-copy em {
+  color: var(--dim);
+  font: normal 10px/1.5 var(--sans);
+}
+.hero-support-arrow {
+  margin-left: auto;
+  padding-left: 8px;
+  color: var(--cyan);
+  font: 16px/1 var(--mono);
+  transition: transform .25s var(--ease);
+}
+.hero-support:hover .hero-support-arrow { transform: translate(3px, -3px); }
+@media (max-width: 480px) {
+  .hero-support { width: 100%; gap: 11px; padding: 12px; }
+  .hero-support-copy b { font-size: 16px; }
+  .hero-support-copy em { font-size: 9.5px; }
+}
